@@ -1,0 +1,27 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-service
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/kiverak/prop-test
+          clone-on-start: true
+          # basedir: file://${user.home}/git-config-server
+          # Для локальной разработки: указываем папку для клона (подключаем как volume при запуске контейнера)
+          basedir: file:///tmp/git-config-server
+          username: kiverak
+          password: ${GITHUB_TOKEN}
+          default-label: main
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,env,refresh
+  endpoint:
+    health:
+      show-details: always
