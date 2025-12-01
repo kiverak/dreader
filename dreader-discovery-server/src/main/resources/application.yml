@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: dreader-discovery-server
+  config:
+    import: optional:configserver:http://localhost:8888
