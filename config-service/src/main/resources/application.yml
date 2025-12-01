@@ -8,7 +8,7 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/kiverak/prop-test
+          uri: https://github.com/kiverak/prop-dreader
           clone-on-start: true
           # basedir: file://${user.home}/git-config-server
           # Для локальной разработки: указываем папку для клона (подключаем как volume при запуске контейнера)
