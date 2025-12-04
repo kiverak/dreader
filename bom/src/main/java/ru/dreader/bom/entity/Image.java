@@ -7,7 +7,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "images")
+@Table(name = "image")
 public class Image extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

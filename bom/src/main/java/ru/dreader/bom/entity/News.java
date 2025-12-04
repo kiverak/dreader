@@ -38,6 +38,4 @@ public class News extends AuditEntity {
 
     @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
-
-    // getters/setters
 }

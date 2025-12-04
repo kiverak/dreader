@@ -3,8 +3,8 @@ package ru.dreader.bom.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Version;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -19,9 +19,11 @@ public abstract class BaseEntity {
     @Version
     private Long version;
 
+    @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
@@ -36,4 +38,3 @@ public abstract class BaseEntity {
         updatedAt = LocalDateTime.now();
     }
 }
-

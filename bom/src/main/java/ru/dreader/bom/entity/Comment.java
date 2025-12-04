@@ -7,7 +7,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "comments")
+@Table(name = "comment")
 public class Comment extends AuditEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

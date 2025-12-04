@@ -16,7 +16,7 @@ import java.util.Set;
 */
 
 @Entity
-@Table(name = "role_data", schema = "todo", catalog = "planner_users")
+@Table(name = "role_data", schema = "dreader", catalog = "planner_users")
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter

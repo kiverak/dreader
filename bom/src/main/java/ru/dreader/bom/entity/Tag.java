@@ -7,7 +7,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "tags")
+@Table(name = "tag")
 public class Tag extends BaseEntity {
 
     @Column(nullable = false, unique = true)
@@ -17,4 +17,3 @@ public class Tag extends BaseEntity {
     private String type; // например: "category" или "region"
 
 }
-
