@@ -1,3 +1,21 @@
-group = "ru.dreader"
-version = "0.0.1-SNAPSHOT"
-description = "dreader"
+plugins {
+    // не применимо здесь глобально, оставляем в подпроектах
+}
+
+group = 'ru.dreader'
+version = '0.0.1-SNAPSHOT'
+description = 'dreader'
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    repositories {
+        mavenCentral()
+    }
+
+    // Общие зависимости для тестов можно прописать здесь
+}

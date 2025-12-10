@@ -2,6 +2,8 @@ plugins {
     id 'java-platform'
 }
 
+description = 'dreader library BOM'
+
 group = 'ru.dreader'
 version = '0.0.1-SNAPSHOT'
 description = 'bom'
