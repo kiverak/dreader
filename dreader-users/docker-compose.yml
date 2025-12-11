@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   postgres:
-    image: postgres:17.6-alpine
+    image: postgres:18.1-alpine
     environment:
       POSTGRES_DB: dreader_users
       POSTGRES_USER: postgres
