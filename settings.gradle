@@ -1,9 +1,8 @@
 rootProject.name = 'dreader'
-
-include("bom")
-include("config-service")
-include("dreader-discovery-server")
-include("dreader-gateway")
-include("dreader-users")
-include("dreader-news")
-include("dreader-parser")
+include 'common'
+include 'common:core'
+include 'common:utils'
+include 'config-service'
+include 'dreader-discovery-server'
+include 'dreader-gateway'
+include 'dreader-users'

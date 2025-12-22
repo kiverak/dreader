@@ -1,10 +1,23 @@
 plugins {
-    // не применимо здесь глобально, оставляем в подпроектах
+    id 'java'
+    id 'org.springframework.boot' version '4.0.1'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'ru.dreader'
-version = '0.0.1-SNAPSHOT'
-description = 'dreader'
+version = '0.0.1'
+
+ext {
+    set('springCloudVersion', "2025.1.0")
+}
+
+repositories {
+//    maven {
+//        name "nexus"
+//        uri "https://nexus.dreader.ru/repository"
+//    }
+    mavenCentral()
+}
 
 allprojects {
     repositories {
@@ -12,10 +25,14 @@ allprojects {
     }
 }
 
-subprojects {
-    repositories {
-        mavenCentral()
-    }
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 
-    // Общие зависимости для тестов можно прописать здесь
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
 }
