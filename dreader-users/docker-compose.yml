@@ -2,9 +2,15 @@ version: '3.8'
 services:
   postgres:
     image: postgres:18.1-alpine
+    container_name: dreader-users
     environment:
       POSTGRES_DB: dreader_users
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
