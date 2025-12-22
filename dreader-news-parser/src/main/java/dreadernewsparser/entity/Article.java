@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -64,5 +65,17 @@ public class Article {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Article article = (Article) o;
+        return Objects.equals(id, article.id) && Objects.equals(url, article.url);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, url);
     }
 }
