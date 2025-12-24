@@ -1,4 +1,4 @@
-package ru.dreader.bom.entity;
+package entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package ru.dreader.bom.entity;
+package entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
