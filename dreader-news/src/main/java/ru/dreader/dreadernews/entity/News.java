@@ -1,4 +1,4 @@
-package entity;
+package ru.dreader.dreadernews.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,10 +12,6 @@ import java.util.List;
 @Setter
 @Table(name = "news")
 public class News extends AuditEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @Column(nullable = false)
     private String title;

@@ -1,4 +1,4 @@
-package entity;
+package ru.dreader.dreadernews.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

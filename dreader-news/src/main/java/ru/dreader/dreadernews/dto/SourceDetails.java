@@ -1,4 +1,4 @@
-package dto;
+package ru.dreader.dreadernews.dto;
 
 import java.util.List;
 
