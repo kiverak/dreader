@@ -1,6 +1,6 @@
 package ru.dreader.dreadernews.repo;
 
-import entity.Article;
+import ru.dreader.dreadernews.entity.Article;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

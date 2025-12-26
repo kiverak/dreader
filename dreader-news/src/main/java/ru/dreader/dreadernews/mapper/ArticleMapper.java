@@ -1,9 +1,9 @@
 package ru.dreader.dreadernews.mapper;
 
-import dto.NewsArticle;
-import entity.Article;
-import entity.Source;
-import entity.Tag;
+import ru.dreader.dreadernews.dto.NewsArticle;
+import ru.dreader.dreadernews.entity.Article;
+import ru.dreader.dreadernews.entity.Source;
+import ru.dreader.dreadernews.entity.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.dreader.dreadernews.service.TagService;

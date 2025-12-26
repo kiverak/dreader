@@ -1,7 +1,8 @@
 package ru.dreader.dreadernews.service;
 
-import dto.NewsArticle;
-import entity.Article;import jakarta.transaction.Transactional;
+import ru.dreader.dreadernews.dto.NewsArticle;
+import ru.dreader.dreadernews.entity.Article;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.dreader.dreadernews.mapper.ArticleMapper;import ru.dreader.dreadernews.repo.ArticleRepository;
