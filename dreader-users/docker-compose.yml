@@ -11,6 +11,31 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - keycloak-network
+
+  keycloak:
+    image: keycloak/keycloak:26.4.7
+    ports:
+      - 8180:8080
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: dreader_users
+      DB_SCHEMA: public
+      DB_USER: postgres
+      DB_PASSWORD: root
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: adminpass
+    networks:
+      - keycloak-network
+    depends_on:
+      - postgres
+
+networks:
+  keycloak-network:
+    driver: bridge
 
 volumes:
   postgres_data:
+    driver: local
