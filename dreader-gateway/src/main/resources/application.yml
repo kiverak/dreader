@@ -5,3 +5,14 @@ spring:
     import: optional:configserver:http://localhost:8888
   profiles:
     active: dreader-gateway, ssl
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8180/realms/dreaderapp-realm
+        registration:
+          keycloak:
+            client-id: dreader-gateway
+            client-secret: <secret>
+            scope: openid, profile, email
