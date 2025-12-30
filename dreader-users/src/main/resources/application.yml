@@ -20,6 +20,10 @@ spring:
             client-id: dreader-users
             client-secret: Nw8qxTTH1mHBLvSZoTIhUTVupBducXIb
             scope: openid
+
+keycloak:
+  realm-url: http://localhost:8180/realms/dreaderapp-realm
+
 server:
   port: 8083
 logging:
