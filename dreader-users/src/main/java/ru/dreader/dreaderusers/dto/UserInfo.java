@@ -7,20 +7,18 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Data
-public class UserDto implements Serializable {
+public class UserInfo implements Serializable {
 
     @NotNull
     String id;
     String email;
     String username;
-    String password;
-
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        UserDto userDto = (UserDto) o;
-        return Objects.equals(id, userDto.id);
+        UserInfo userInfo = (UserInfo) o;
+        return Objects.equals(id, userInfo.id);
     }
 
     @Override

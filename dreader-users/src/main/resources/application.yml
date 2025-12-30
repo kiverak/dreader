@@ -4,4 +4,26 @@ spring:
   config:
     import: optional:configserver:http://localhost:8888
   profiles:
-    active: dreader-micro, dreader-users, kc
+    active: dreader-micro, dreader-users
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/dreaderapp-realm
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8180/realms/dreaderapp-realm
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: dreader-users
+            client-secret: Nw8qxTTH1mHBLvSZoTIhUTVupBducXIb
+            scope: openid
+server:
+  port: 8083
+logging:
+  level:
+    org:
+      springframework:
+        security: TRACE

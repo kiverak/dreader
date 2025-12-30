@@ -2,7 +2,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:18.1-alpine
-    container_name: dreader-users
+#    container_name: dreader-users
     environment:
       POSTGRES_DB: dreader_users
       POSTGRES_USER: postgres
@@ -16,17 +16,16 @@ services:
 
   keycloak:
     image: keycloak/keycloak:26.4.7
+    command: start-dev
     ports:
-      - 8180:8080
+      - "8180:8080"
     environment:
-      DB_VENDOR: POSTGRES
-      DB_ADDR: postgres
-      DB_DATABASE: dreader_users
-      DB_SCHEMA: public
-      DB_USER: postgres
-      DB_PASSWORD: root
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: adminpass
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/dreader_users
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: root
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: adminpass
     networks:
       - keycloak-network
     depends_on:
