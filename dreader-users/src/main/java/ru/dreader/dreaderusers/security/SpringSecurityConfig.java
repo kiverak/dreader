@@ -28,8 +28,8 @@ public class SpringSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        final String[] USER_ACCESS_ENDPOINTS = {"/user/*", "/category/*", "/priority/*", "/task/*"};
-        final String[] PERMIT_ALL_ACCESS_ENDPOINTS = {"/auth/**", "/error", "/test/**"};
+        final String[] PERMIT_ALL_ACCESS_ENDPOINTS = {"/api/auth/**", "/api/error", "/test/**"};
+        final String[] USER_ACCESS_ENDPOINTS = {"/api/user/**", "/api/category/*"};
 
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
         http.oauth2Login(Customizer.withDefaults());
@@ -37,7 +37,7 @@ public class SpringSecurityConfig {
         return http
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(PERMIT_ALL_ACCESS_ENDPOINTS).permitAll()
-                        .requestMatchers("/admin/*").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(USER_ACCESS_ENDPOINTS).hasRole("USER")
                         .anyRequest().authenticated())
                 .build();

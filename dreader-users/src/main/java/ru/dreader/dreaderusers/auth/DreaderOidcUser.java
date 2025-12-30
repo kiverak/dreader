@@ -19,8 +19,7 @@ public class DreaderOidcUser extends DefaultOidcUser {
         allPermissions.addAll(permissions);
     }
 
-    @Override
-    public String getName() {
+    public String getEmail() {
         return getIdToken().getEmail();
     }
 

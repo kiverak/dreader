@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @EnableDiscoveryClient
 @ComponentScan(basePackages = {"ru.dreader.dreaderusers.**"})
-@EntityScan(basePackages = "entity, exception")
+@EntityScan(basePackages = "ru.dreader.dreaderusers.entity, exception")
 @RefreshScope
 public class DreaderUsersApplication {
 

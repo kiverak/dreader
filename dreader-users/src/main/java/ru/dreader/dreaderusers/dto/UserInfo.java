@@ -13,6 +13,7 @@ public class UserInfo implements Serializable {
     String id;
     String email;
     String username;
+    String telegramAccount;
 
     @Override
     public boolean equals(Object o) {

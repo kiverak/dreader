@@ -1,5 +1,8 @@
 version: '3.8'
 services:
+  # -----------------------------
+  # Keycloak database
+  # -----------------------------
   postgres:
     image: postgres:18.1-alpine
 #    container_name: dreader-users
@@ -31,10 +34,26 @@ services:
     depends_on:
       - postgres
 
+  # -----------------------------
+  # User-service database
+  # -----------------------------
+  users-postgres:
+    image: postgres:18.1-alpine
+    environment:
+      POSTGRES_DB: dreader_users_data
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5434:5432"
+    volumes:
+      - users_pgdata:/var/lib/postgresql/data
+    networks:
+      - keycloak-network
+
 networks:
   keycloak-network:
     driver: bridge
 
 volumes:
   postgres_data:
-    driver: local
+  users_pgdata:
