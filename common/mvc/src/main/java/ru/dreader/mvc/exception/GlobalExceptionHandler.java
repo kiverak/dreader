@@ -1,4 +1,4 @@
-package exception;
+package ru.dreader.mvc.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;

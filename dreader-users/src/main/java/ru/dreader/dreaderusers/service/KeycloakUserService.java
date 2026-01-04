@@ -1,12 +1,12 @@
 package ru.dreader.dreaderusers.service;
 
-import exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.dreader.dreaderusers.dto.UserDto;
+import ru.dreader.mvc.exception.UserNotFoundException;
 
 import java.util.HashMap;
 import java.util.List;

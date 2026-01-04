@@ -1,6 +1,6 @@
 package ru.dreader.dreaderusers.service;
 
-import exception.UserNotFoundException;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.core.Authentication;
@@ -14,6 +14,7 @@ import ru.dreader.dreaderusers.dto.UserInfo;
 import ru.dreader.dreaderusers.entity.UserEntity;
 import ru.dreader.dreaderusers.mapper.UserToUserDtoMapper;
 import ru.dreader.dreaderusers.repo.UserRepository;
+import ru.dreader.mvc.exception.UserNotFoundException;
 
 import java.time.Instant;
 import java.util.List;

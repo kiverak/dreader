@@ -1,27 +1,32 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '4.0.1'
+    id 'java-library'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'ru.dreader'
 version = '0.0.1'
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
 
-    runtimeOnly 'org.postgresql:postgresql'
+dependencies {
+    api 'com.fasterxml.jackson.core:jackson-annotations'
+    api 'jakarta.validation:jakarta.validation-api'
+    api 'org.slf4j:slf4j-api'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.9"
+    }
 }
 
 test {

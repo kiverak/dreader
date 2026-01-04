@@ -1,4 +1,4 @@
-package exception;
+package ru.dreader.mvc.exception;
 
 import java.time.LocalDateTime;
 

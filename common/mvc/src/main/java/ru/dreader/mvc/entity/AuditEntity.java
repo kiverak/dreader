@@ -1,4 +1,4 @@
-package entity;
+package ru.dreader.mvc.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

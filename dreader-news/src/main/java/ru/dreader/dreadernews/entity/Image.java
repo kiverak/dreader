@@ -1,9 +1,9 @@
 package ru.dreader.dreadernews.entity;
 
-import entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import ru.dreader.mvc.entity.BaseEntity;
 
 @Entity
 @Getter
