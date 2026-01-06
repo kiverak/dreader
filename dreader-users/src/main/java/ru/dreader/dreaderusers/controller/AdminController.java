@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
 import ru.dreader.dreaderusers.dto.UserDto;
-import ru.dreader.dreaderusers.dto.UserInfo;
 import ru.dreader.dreaderusers.service.UserService;
 
 @Log4j2
@@ -19,17 +18,17 @@ public class AdminController {
     private final UserService userService;
 
     @GetMapping("/{email}")
-    public UserInfo getUserInfoByEmail(@PathVariable @Email String email) {
+    public dto.UserInfo getUserInfoByEmail(@PathVariable @Email String email) {
         return userService.getUserInfoByEmail(email);
     }
 
     @GetMapping("/{keycloakId}")
-    public UserInfo getUserInfoById(@PathVariable String keycloakId) {
+    public dto.UserInfo getUserInfoById(@PathVariable String keycloakId) {
         return userService.getUserInfoById(keycloakId);
     }
 
     @PutMapping("/{keycloakId}")
-    public UserInfo updateUser(@PathVariable String keycloakId, @RequestBody UserDto userDto) {
+    public dto.UserInfo updateUser(@PathVariable String keycloakId, @RequestBody UserDto userDto) {
         return userService.updateUser(keycloakId, userDto);
     }
 

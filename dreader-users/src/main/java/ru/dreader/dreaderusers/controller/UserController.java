@@ -3,7 +3,6 @@ package ru.dreader.dreaderusers.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.dreader.dreaderusers.dto.UserDto;
-import ru.dreader.dreaderusers.dto.UserInfo;
 import ru.dreader.dreaderusers.service.UserService;
 
 @RestController
@@ -14,12 +13,12 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping()
-    public UserInfo getCurrentUserInfo() {
+    public dto.UserInfo getCurrentUserInfo() {
         return userService.getCurrentUserInfo();
     }
 
     @PutMapping()
-    public UserInfo updateUser(@RequestBody UserDto userDto) {
+    public dto.UserInfo updateUser(@RequestBody UserDto userDto) {
         String keycloakId = userService.getCurrentUserInfo().getId();
         return userService.updateUser(keycloakId, userDto);
     }

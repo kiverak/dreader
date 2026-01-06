@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.dreader.dreaderusers.auth.DreaderOidcUser;
 import ru.dreader.dreaderusers.dto.UserDto;
-import ru.dreader.dreaderusers.dto.UserInfo;
 import ru.dreader.dreaderusers.entity.UserEntity;
 import ru.dreader.dreaderusers.mapper.UserToUserDtoMapper;
 import ru.dreader.dreaderusers.repo.UserRepository;
@@ -29,12 +27,12 @@ public class UserService {
     private final KeycloakUserSyncService keycloakUserSyncService;
 
     @Transactional(readOnly = true)
-    public UserInfo getUserInfoByEmail(final String email) {
+    public dto.UserInfo getUserInfoByEmail(final String email) {
         return getUserFromRepoByEmail(email);
     }
 
     @Transactional(readOnly = true)
-    public UserInfo getUserInfoById(String id) {
+    public dto.UserInfo getUserInfoById(String id) {
         UserEntity userEntity = userRepository.findById(id)
                 .orElseGet(() -> keycloakUserSyncService.syncUserFromKeycloakIfExists(id, false));
         if (userEntity == null) {
@@ -47,7 +45,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserInfo getCurrentUserInfo() {
+    public dto.UserInfo getCurrentUserInfo() {
         DreaderOidcUser oidcUser = getCurrentOidcUser();
         String email = oidcUser.getEmail();
         return getUserFromRepoByEmail(email);
@@ -82,7 +80,7 @@ public class UserService {
 //        return getUserFromRepoByEmail(email);
 //    }
 
-    private UserInfo getUserFromRepoByEmail(String email) {
+    private dto.UserInfo getUserFromRepoByEmail(String email) {
         UserEntity userEntity = userRepository.findByEmail(email)
                 .orElseGet(() -> keycloakUserSyncService.syncUserFromKeycloakIfExists(email, true));
         if (userEntity == null) {
@@ -106,7 +104,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserInfo createUser(UserDto userDto) {
+    public dto.UserInfo createUser(UserDto userDto) {
         if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatusCode.valueOf(409), "User with this email already exists: " + userDto.getEmail());
         }
@@ -120,7 +118,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserInfo updateUser(String id, UserDto userDto) {
+    public dto.UserInfo updateUser(String id, UserDto userDto) {
         UserEntity userEntity = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         if (userEntity.isDeleted()) {
             throw new ResponseStatusException(HttpStatusCode.valueOf(400), "User with this id deleted: " + id);

@@ -2,17 +2,16 @@ package ru.dreader.dreaderusers.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.dreader.dreaderusers.dto.UserDto;
-import ru.dreader.dreaderusers.dto.UserInfo;
 import ru.dreader.dreaderusers.entity.UserEntity;
 
 @Component
 public class UserToUserDtoMapper {
 
-    public UserInfo toUserInfo(UserEntity userEntity) {
+    public dto.UserInfo toUserInfo(UserEntity userEntity) {
         if (userEntity == null) {
             return null;
         }
-        UserInfo userInfo = new UserInfo();
+        dto.UserInfo userInfo = new dto.UserInfo();
         userInfo.setId(String.valueOf(userEntity.getId()));
         userInfo.setEmail(userEntity.getEmail());
         userInfo.setUsername(userEntity.getUsername());

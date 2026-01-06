@@ -23,9 +23,9 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/news/public/**").permitAll()
-                        .requestMatchers("/api/news/user/**").hasRole("USER")
-                        .requestMatchers("/api/news/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/api/user/**").hasRole("USER")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
 //                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));

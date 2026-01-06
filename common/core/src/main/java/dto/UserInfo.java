@@ -1,4 +1,4 @@
-package ru.dreader.dreaderusers.dto;
+package dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
