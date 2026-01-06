@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: dreader-llm-parser
+  ai:
+    ollama:
+      chat:
+        model: llama3.1:8b #llama3.2:1b, deepseek-r1:1.5b, gemma3:1b

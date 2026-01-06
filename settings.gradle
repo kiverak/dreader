@@ -1,6 +1,7 @@
 rootProject.name = 'dreader'
 include 'common'
 include 'common:core'
+include 'common:mvc'
 include 'common:utils'
 include 'config-service'
 include 'dreader-discovery-server'
