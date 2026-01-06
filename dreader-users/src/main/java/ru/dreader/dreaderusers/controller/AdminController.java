@@ -10,7 +10,7 @@ import ru.dreader.dreaderusers.service.UserService;
 
 @Log4j2
 @RestController
-@RequestMapping("/api/users/admin")
+@RequestMapping("/api/admin")
 @RequiredArgsConstructor
 public class AdminController {
 

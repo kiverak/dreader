@@ -1,10 +1,10 @@
 package ru.dreader.dreaderusers.service;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -52,6 +52,35 @@ public class UserService {
         String email = oidcUser.getEmail();
         return getUserFromRepoByEmail(email);
     }
+
+//    public UserInfo getCurrentUserInfo() {
+//        var authentication = SecurityContextHolder.getContext().getAuthentication();
+//        var principal = authentication.getPrincipal();
+//
+//        String username;
+//        String email;
+//        String keycloakId;
+//
+//        // Проверяем, является ли principal JWT токеном (Resource Server)
+//        if (principal instanceof Jwt jwt) {
+//            // Извлекаем данные из claims токена
+//            username = jwt.getClaimAsString("preferred_username");
+//            email = jwt.getClaimAsString("email");
+//            keycloakId = jwt.getSubject(); // Обычно 'sub' - это ID пользователя в Keycloak
+//        }
+//        // Если вдруг вы поддерживаете и старый вариант (OidcUser)
+//    /* else if (principal instanceof DreaderOidcUser user) {
+//        username = user.getPreferredUsername();
+//        email = user.getEmail();
+//        keycloakId = user.getName();
+//    } */
+//        else {
+//            throw new IllegalStateException("Неизвестный тип авторизации: " + principal.getClass());
+//        }
+//        // Дальнейшая логика поиска пользователя в БД или создания нового
+//        // ...
+//        return getUserFromRepoByEmail(email);
+//    }
 
     private UserInfo getUserFromRepoByEmail(String email) {
         UserEntity userEntity = userRepository.findByEmail(email)

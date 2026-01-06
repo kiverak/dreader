@@ -7,7 +7,7 @@ import ru.dreader.dreaderusers.dto.UserInfo;
 import ru.dreader.dreaderusers.service.UserService;
 
 @RestController
-@RequestMapping("/api/users/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
