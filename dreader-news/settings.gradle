@@ -1,1 +1,2 @@
 rootProject.name = 'dreader-news'
+includeBuild '../common'

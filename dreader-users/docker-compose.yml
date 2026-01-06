@@ -1,8 +1,11 @@
 version: '3.8'
 services:
+  # -----------------------------
+  # Keycloak database
+  # -----------------------------
   postgres:
     image: postgres:18.1-alpine
-    container_name: dreader-users
+#    container_name: dreader-users
     environment:
       POSTGRES_DB: dreader_users
       POSTGRES_USER: postgres
@@ -11,6 +14,46 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - keycloak-network
+
+  keycloak:
+    image: keycloak/keycloak:26.4.7
+    command: start-dev
+    ports:
+      - "8180:8080"
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/dreader_users
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: root
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: adminpass
+    networks:
+      - keycloak-network
+    depends_on:
+      - postgres
+
+  # -----------------------------
+  # User-service database
+  # -----------------------------
+  users-postgres:
+    image: postgres:18.1-alpine
+    environment:
+      POSTGRES_DB: dreader_users_data
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5434:5432"
+    volumes:
+      - users_pgdata:/var/lib/postgresql/data
+    networks:
+      - keycloak-network
+
+networks:
+  keycloak-network:
+    driver: bridge
 
 volumes:
   postgres_data:
+  users_pgdata:
