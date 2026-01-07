@@ -5,3 +5,31 @@ spring:
     import: optional:configserver:http://localhost:8888
   profiles:
     active: dreader-micro, dreader-users
+
+  security:
+    oauth2:
+      client:
+        registration: # OAuth2 Login для фронта
+          keycloak-login:
+            provider: keycloak
+            client-id: dreader-frontend
+            client-secret: FRONTEND_SECRET
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+            scope: openid, profile, email
+
+            # client_credentials для Keycloak Admin API
+          keycloak-admin:
+            provider: keycloak
+            client-id: dreader-users
+            client-secret: USERS_SERVICE_SECRET
+            authorization-grant-type: client_credentials
+
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8180/realms/dreaderapp-realm
+            user-name-attribute: preferred_username
+
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/dreaderapp-realm

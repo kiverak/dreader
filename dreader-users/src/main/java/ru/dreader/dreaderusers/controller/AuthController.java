@@ -1,7 +1,10 @@
 package ru.dreader.dreaderusers.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.dreader.dreaderusers.dto.UserDto;
 import ru.dreader.dreaderusers.service.UserService;
 
@@ -11,11 +14,6 @@ import ru.dreader.dreaderusers.service.UserService;
 public class AuthController {
 
     private final UserService userService;
-
-    @GetMapping()
-    public String login() {
-        return "login planner-users";
-    }
 
     @PostMapping("/register")
     public dto.UserInfo createUser(@RequestBody UserDto userDto) {

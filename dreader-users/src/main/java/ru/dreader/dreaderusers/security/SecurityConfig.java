@@ -6,6 +6,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -27,14 +28,17 @@ public class SecurityConfig {
         final String[] USER_ACCESS_ENDPOINTS = {"/api/user/**", "/api/category/*"};
         final String[] ADMIN_ACCESS_ENDPOINTS = {"/api/admin/**"};
 
-        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
-//        http.oauth2Login(Customizer.withDefaults());
+        http.oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())) );
+        http.oauth2Login(Customizer.withDefaults());
 
         return http
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(PERMIT_ALL_ACCESS_ENDPOINTS).permitAll()
                         .requestMatchers(ADMIN_ACCESS_ENDPOINTS).hasRole("ADMIN")
                         .requestMatchers(USER_ACCESS_ENDPOINTS).hasRole("USER")
+                        .requestMatchers("/api/internal/**").hasRole("INTERNAL_SERVICE")
                         .anyRequest().authenticated())
                 .build();
     }
