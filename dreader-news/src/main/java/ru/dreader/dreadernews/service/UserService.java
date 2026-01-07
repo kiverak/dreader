@@ -9,12 +9,24 @@ import dto.UserInfo;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final WebClient.Builder webClientBuilder;
+    private final WebClient userWebClient;
+    private final WebClient serviceWebClient;
 
+    // user request
     public UserInfo getCurrentUserInfo() {
-        return webClientBuilder.build()
+        return userWebClient
                 .get()
-                .uri("http://dreader-users/api/user")
+                .uri("localhost:8765/users/api/user")
+                .retrieve()
+                .bodyToMono(UserInfo.class)
+                .block();
+    }
+
+    // service request
+    public UserInfo getUserById(String id) {
+        return serviceWebClient
+                .get()
+                .uri("http://localhost:8765/users/api/internal/users/" + id)
                 .retrieve()
                 .bodyToMono(UserInfo.class)
                 .block();
