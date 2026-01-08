@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import ru.dreader.dreaderusers.auth.DreaderOidcUser;
 import ru.dreader.dreaderusers.dto.UserDto;
 import ru.dreader.dreaderusers.entity.UserEntity;
 import ru.dreader.dreaderusers.mapper.UserToUserDtoMapper;
@@ -46,39 +46,10 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public dto.UserInfo getCurrentUserInfo() {
-        DreaderOidcUser oidcUser = getCurrentOidcUser();
-        String email = oidcUser.getEmail();
+        Jwt jwt = getCurrentJwt();
+        String email = jwt.getClaimAsString("email");
         return getUserFromRepoByEmail(email);
     }
-
-//    public UserInfo getCurrentUserInfo() {
-//        var authentication = SecurityContextHolder.getContext().getAuthentication();
-//        var principal = authentication.getPrincipal();
-//
-//        String username;
-//        String email;
-//        String keycloakId;
-//
-//        // Проверяем, является ли principal JWT токеном (Resource Server)
-//        if (principal instanceof Jwt jwt) {
-//            // Извлекаем данные из claims токена
-//            username = jwt.getClaimAsString("preferred_username");
-//            email = jwt.getClaimAsString("email");
-//            keycloakId = jwt.getSubject(); // Обычно 'sub' - это ID пользователя в Keycloak
-//        }
-//        // Если вдруг вы поддерживаете и старый вариант (OidcUser)
-//    /* else if (principal instanceof DreaderOidcUser user) {
-//        username = user.getPreferredUsername();
-//        email = user.getEmail();
-//        keycloakId = user.getName();
-//    } */
-//        else {
-//            throw new IllegalStateException("Неизвестный тип авторизации: " + principal.getClass());
-//        }
-//        // Дальнейшая логика поиска пользователя в БД или создания нового
-//        // ...
-//        return getUserFromRepoByEmail(email);
-//    }
 
     private dto.UserInfo getUserFromRepoByEmail(String email) {
         UserEntity userEntity = userRepository.findByEmail(email)
@@ -92,10 +63,15 @@ public class UserService {
         return userToUserDtoMapper.toUserInfo(userEntity);
     }
 
-    public DreaderOidcUser getCurrentOidcUser() {
+    public Jwt getCurrentJwt() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (userIsLogin(auth))
-            return (DreaderOidcUser) auth.getPrincipal();
+        if (userIsLogin(auth)) {
+            Object principal = auth.getPrincipal();
+            if (principal instanceof Jwt) {
+                return (Jwt) principal;
+            }
+            throw new ClassCastException("Principal is not a Jwt: " + principal.getClass());
+        }
         throw new RuntimeException("There are no login user");
     }
 

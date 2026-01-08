@@ -15,8 +15,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class OAuth2ClientConfig {
 
-    @Value("${keycloak.realm-url}")
-    private String realmUrl;
+    @Value("${keycloak.admin-realm-url}")
+    private String adminRealmUrl;
 
     @Bean
     public OAuth2AuthorizedClientManager authorizedClientManager(
@@ -43,7 +43,7 @@ public class OAuth2ClientConfig {
 
         return WebClient.builder()
                 .apply(oauth.oauth2Configuration())
-                .baseUrl(realmUrl)
+                .baseUrl(adminRealmUrl)
                 .build();
     }
 }

@@ -8,7 +8,9 @@ import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+/*
+кастомная модель пользователя в SecurityContext, если нужно хранить не только роли, но и permissions
+ */
 @Getter
 public class DreaderOidcUser extends DefaultOidcUser {
 

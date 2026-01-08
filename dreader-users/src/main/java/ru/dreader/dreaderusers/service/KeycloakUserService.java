@@ -47,6 +47,10 @@ public class KeycloakUserService {
                         .build()
                 )
                 .retrieve()
+                .onStatus(HttpStatusCode::isError, resp ->
+                        resp.bodyToMono(String.class)
+                                .map(body -> new RuntimeException("Keycloak error: " + body))
+                )
                 .bodyToMono(new ParameterizedTypeReference<List<Map<String, Object>>>() {
                 })
                 .block();
