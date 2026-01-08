@@ -9,16 +9,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+// TODO remove after Kafka sending creation
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/news")
-public class NewsParserController {
+public class NewsController {
     private final int NEWS_BATCH_SIZE = 10;
 
     private final ArticleService articleService;
 
-    @GetMapping("/getNews")
-    public List<NewsArticle> getNews() {
+    @GetMapping()
+    public List<NewsArticle> getNewsBatch() {
         return articleService.getNewArticles(NEWS_BATCH_SIZE);
     }
 }

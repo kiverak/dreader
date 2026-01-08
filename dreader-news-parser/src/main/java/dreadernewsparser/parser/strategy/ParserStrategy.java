@@ -17,6 +17,7 @@ public interface ParserStrategy {
         Document doc = httpClientConfig.prepareRequest(url).get();
 
         return new NewsArticle(
+                source.getId(),
                 url,
                 getTitle(doc),
                 getViewsCount(doc),

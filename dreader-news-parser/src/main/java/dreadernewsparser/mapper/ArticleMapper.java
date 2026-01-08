@@ -23,6 +23,7 @@ public class ArticleMapper {
         }
 
         Article article = new Article();
+        article.setId(newsArticle.id());
         article.setTitle(newsArticle.title());
         article.setViewsCount(newsArticle.viewsCount());
         article.setCommentsCount(newsArticle.commentsCount());
@@ -59,6 +60,7 @@ public class ArticleMapper {
                 Collections.emptyList();
 
         return new NewsArticle(
+                article.getId(),
                 article.getUrl(),
                 article.getTitle(),
                 article.getViewsCount(),

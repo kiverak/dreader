@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record NewsArticle(
+        Long id,
         String url,
         String title,
         Integer viewsCount,

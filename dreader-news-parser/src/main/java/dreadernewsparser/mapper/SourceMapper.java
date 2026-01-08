@@ -18,6 +18,7 @@ public class SourceMapper {
         }
 
         Source source = new Source();
+        source.setId(sourceDetails.id());
         source.setName(sourceDetails.name());
         source.setUrl(sourceDetails.url());
         source.setDefaultTags(defaultTags);
@@ -34,6 +35,7 @@ public class SourceMapper {
                 Collections.emptyList();
 
         return new SourceDetails(
+                source.getId(),
                 source.getName(),
                 source.getUrl(),
                 tagNames

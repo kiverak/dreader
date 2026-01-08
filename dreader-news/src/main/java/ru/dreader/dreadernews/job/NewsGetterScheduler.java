@@ -1,5 +1,6 @@
 package ru.dreader.dreadernews.job;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
 import ru.dreader.dreadernews.dto.NewsArticle;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,8 @@ import ru.dreader.dreadernews.service.ArticleService;
 
 import java.util.List;
 
+// TODO remove after Kafka sending creation
+@Log4j2
 @Service
 public class NewsGetterScheduler {
 
@@ -23,14 +26,15 @@ public class NewsGetterScheduler {
         this.sourceService = sourceService;
     }
 
-    @Scheduled(fixedRate = 60_000) // каждые 60 секунд
+    @Scheduled(fixedRate = 5_000) // каждые 5 секунд
     public void getNews() {
-        System.out.println("Getting sources...");
         List<SourceDetails> allSources = newsParserClient.getAllSources();
-        sourceService.saveAll(allSources);
+        sourceService.saveOrUpdateAll(allSources);
 
+        log.info("Getting news...");
         List<NewsArticle> news = newsParserClient.getNews();
         articleService.saveAll(news);
+        log.info("{} fresh news saved", news.size());
     }
 
 }
