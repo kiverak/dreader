@@ -2,7 +2,7 @@ package ru.dreader.dreadernews.job;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
-import ru.dreader.dreadernews.dto.NewsArticle;
+import ru.dreader.dreadernews.dto.ArticleDto;
 import org.springframework.stereotype.Service;
 import ru.dreader.dreadernews.dto.SourceDetails;
 import ru.dreader.dreadernews.service.SourceService;
@@ -32,7 +32,7 @@ public class NewsGetterScheduler {
         sourceService.saveOrUpdateAll(allSources);
 
         log.info("Getting news...");
-        List<NewsArticle> news = newsParserClient.getNews();
+        List<ArticleDto> news = newsParserClient.getNews();
         articleService.saveAll(news);
         log.info("{} fresh news saved", news.size());
     }

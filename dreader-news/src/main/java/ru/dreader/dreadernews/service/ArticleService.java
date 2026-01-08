@@ -1,13 +1,20 @@
 package ru.dreader.dreadernews.service;
 
-import ru.dreader.dreadernews.dto.NewsArticle;
-import ru.dreader.dreadernews.entity.Article;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.dreader.dreadernews.mapper.ArticleMapper;import ru.dreader.dreadernews.repo.ArticleRepository;
+import org.springframework.transaction.annotation.Transactional;
+import ru.dreader.dreadernews.dto.ArticleDto;
+import ru.dreader.dreadernews.entity.Article;
+import ru.dreader.dreadernews.mapper.ArticleMapper;
+import ru.dreader.dreadernews.repo.ArticleRepository;
+import ru.dreader.mvc.exception.ResourceNotFoundException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,9 +24,31 @@ public class ArticleService {
     private final ArticleMapper articleMapper;
 
     @Transactional
-    public void saveAll(List<NewsArticle> newsArticles) {
-        List<Article> articles = articleMapper.toEntity(newsArticles);
+    public void saveAll(List<ArticleDto> articleDtoList) {
+        List<Article> articles = articleMapper.toEntity(articleDtoList);
         articleRepository.saveAll(articles);
     }
 
+    @Transactional(readOnly = true)
+    public ArticleDto getById(Long id) {
+        Article article = articleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Article not found: " + id));
+        return articleMapper.toDto(article);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ArticleDto> getLast(Long tagId, Integer size, Integer page, String sort, String order) {
+        Sort sortBy = Sort.by(Sort.Direction.fromString(order != null ? order : "DESC"), sort);
+        Pageable pageable = PageRequest.of(page, size, sortBy);
+
+        Page<Article> articlePage;
+        if (tagId != null) {
+             articlePage = articleRepository.findByTags_Id(tagId, pageable);
+        } else {
+            articlePage = articleRepository.findAll(pageable);
+        }
+
+        return articlePage.getContent().stream()
+                .map(articleMapper::toDto)
+                .collect(Collectors.toList());
+    }
 }

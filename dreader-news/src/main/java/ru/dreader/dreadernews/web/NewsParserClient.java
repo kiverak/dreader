@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import ru.dreader.dreadernews.dto.NewsArticle;
+import ru.dreader.dreadernews.dto.ArticleDto;
 import ru.dreader.dreadernews.dto.SourceDetails;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public class NewsParserClient {
         this.webClient = webClientBuilder.baseUrl("http://localhost:8765/parser/api").build();
     }
 
-    public List<NewsArticle> getNews() {
+    public List<ArticleDto> getNews() {
         return webClient.get()
                 .uri("/news")
                 .retrieve()
@@ -26,7 +26,7 @@ public class NewsParserClient {
                     response.bodyToMono(String.class)
                             .flatMap(errorBody -> Mono.error(new RuntimeException("Error getting news: " + errorBody)))
                 )
-                .bodyToFlux(NewsArticle.class)
+                .bodyToFlux(ArticleDto.class)
                 .collectList()
                 .block();
     }

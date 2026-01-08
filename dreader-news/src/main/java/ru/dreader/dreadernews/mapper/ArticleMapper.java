@@ -1,6 +1,6 @@
 package ru.dreader.dreadernews.mapper;
 
-import ru.dreader.dreadernews.dto.NewsArticle;
+import ru.dreader.dreadernews.dto.ArticleDto;
 import ru.dreader.dreadernews.entity.Article;
 import ru.dreader.dreadernews.entity.Source;
 import ru.dreader.dreadernews.entity.Tag;
@@ -17,31 +17,31 @@ public class ArticleMapper {
 
     private final TagService tagService;
 
-    public Article toEntity(NewsArticle newsArticle) {
-        if (newsArticle == null) {
+    public Article toEntity(ArticleDto articleDto) {
+        if (articleDto == null) {
             return null;
         }
 
         Article article = new Article();
-        article.setTitle(newsArticle.title());
-        article.setViewsCount(newsArticle.viewsCount());
-        article.setCommentsCount(newsArticle.commentsCount());
-        article.setContent(newsArticle.content());
-        if (newsArticle.shortContent() == null || newsArticle.shortContent().isEmpty()) {
-            article.setShortContent(newsArticle.content().substring(0, Math.min(200, newsArticle.content().length())));
+        article.setTitle(articleDto.title());
+        article.setViewsCount(articleDto.viewsCount());
+        article.setCommentsCount(articleDto.commentsCount());
+        article.setContent(articleDto.content());
+        if (articleDto.shortContent() == null || articleDto.shortContent().isEmpty()) {
+            article.setShortContent(articleDto.content().substring(0, Math.min(200, articleDto.content().length())));
         } else {
-            article.setShortContent(newsArticle.shortContent());
+            article.setShortContent(articleDto.shortContent());
         }
-        article.setUrl(newsArticle.url());
-        article.setImageUrl(newsArticle.imageUrl());
-        article.setPublicationDate(newsArticle.publicationDate());
-        article.setTags(tagService.getOrCreateByNames(newsArticle.tags()));
+        article.setUrl(articleDto.url());
+        article.setImageUrl(articleDto.imageUrl());
+        article.setPublicationDate(articleDto.publicationDate());
+        article.setTags(tagService.getOrCreateByNames(articleDto.tags()));
 
         return article;
     }
 
-    public Article toEntity(NewsArticle newsArticle, Source source) {
-        Article article = toEntity(newsArticle);
+    public Article toEntity(ArticleDto articleDto, Source source) {
+        Article article = toEntity(articleDto);
         article.setSource(source);
         if (article.getTags() == null || article.getTags().isEmpty()) {
             article.setTags(source.getDefaultTags());
@@ -49,15 +49,15 @@ public class ArticleMapper {
         return article;
     }
 
-    public List<Article> toEntity(List<NewsArticle> newsArticles) {
+    public List<Article> toEntity(List<ArticleDto> articleDtoList) {
         List<Article> articles = new ArrayList<>();
-        for (NewsArticle na : newsArticles) {
+        for (ArticleDto na : articleDtoList) {
             articles.add(toEntity(na));
         }
         return articles;
     }
 
-    public NewsArticle toDto(Article article) {
+    public ArticleDto toDto(Article article) {
         if (article == null) {
             return null;
         }
@@ -66,7 +66,7 @@ public class ArticleMapper {
                 article.getTags().stream().map(Tag::getName).toList() :
                 Collections.emptyList();
 
-        return new NewsArticle(
+        return new ArticleDto(
                 article.getUrl(),
                 article.getTitle(),
                 article.getViewsCount(),
