@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -24,23 +23,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        final String[] PERMIT_ALL_ACCESS_ENDPOINTS = {"/api/auth/**", "/api/error", "/api/test"};
-        final String[] USER_ACCESS_ENDPOINTS = {"/api/user/**", "/api/category/*"};
-        final String[] ADMIN_ACCESS_ENDPOINTS = {"/api/admin/**"};
-
-        http.oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())) );
-        http.oauth2Login(Customizer.withDefaults());
-
-        return http
+        http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers(PERMIT_ALL_ACCESS_ENDPOINTS).permitAll()
-                        .requestMatchers(ADMIN_ACCESS_ENDPOINTS).hasRole("ADMIN")
-                        .requestMatchers(USER_ACCESS_ENDPOINTS).hasRole("USER")
+                        .requestMatchers("/api/auth/register", "/api/test").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/user/**").hasRole("USER")
                         .requestMatchers("/api/internal/**").hasRole("INTERNAL_SERVICE")
-                        .anyRequest().authenticated())
+                        .anyRequest().authenticated()
+                )
+                .oauth2Login(Customizer.withDefaults())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
                 .build();
+
+        return http.build();
     }
 
     // преобразование "сырого" JWT-токена (полученного от Keycloak) в объект аутентификации Spring Security
@@ -54,12 +51,12 @@ public class SecurityConfig {
             var roles = (List<String>) jwt.getClaimAsMap("realm_access").get("roles");
             if (roles == null) roles = List.of();
 
-            return Stream.concat(authorities.stream(),
-                            roles.stream()
-                                    .filter(role -> role.startsWith("ROLE_"))
-                                    .map(SimpleGrantedAuthority::new)
-                                    .map(GrantedAuthority.class::cast))
+            var roleAuthorities = roles.stream()
+                    .filter(r -> r.startsWith("ROLE_"))
+                    .map(SimpleGrantedAuthority::new)
                     .toList();
+
+            return Stream.concat(authorities.stream(), roleAuthorities.stream()).toList();
         });
 
         return converter;

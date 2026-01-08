@@ -3,11 +3,18 @@ package ru.dreader.dreaderusers.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import ru.dreader.dreaderusers.dto.UserDto;
+import ru.dreader.mvc.exception.KeycloakException;
+import ru.dreader.mvc.exception.UserAlreadyExistsException;
 import ru.dreader.mvc.exception.UserNotFoundException;
 
+import javax.management.relation.RoleNotFoundException;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,11 +24,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class KeycloakUserService {
 
-    private final WebClient keycloakWebClient;
+    private final WebClient adminWebClient;
 
     public Map<String, Object> findKeycloakUserByUserId(String userId) {
         log.info("Fetching Keycloak user {}", userId);
-        return keycloakWebClient
+        return adminWebClient
                 .get()
                 .uri("/users/{id}", userId)
                 .retrieve()
@@ -32,7 +39,7 @@ public class KeycloakUserService {
 
     public List<Map<String, Object>> searchKeycloakUsersByEmail(String email) {
         log.info("Searching Keycloak users by email {}", email);
-        return keycloakWebClient
+        return adminWebClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/users")
@@ -60,19 +67,32 @@ public class KeycloakUserService {
                 )
         );
 
-        String userId = keycloakWebClient
+        String userId = adminWebClient
                 .post()
                 .uri("/users")
                 .bodyValue(payload)
                 .retrieve()
+                .onStatus(status -> status.value() == 409,
+                        resp -> resp.bodyToMono(String.class)
+                                .map(body -> new UserAlreadyExistsException(
+                                        "User already exists: " + userDto.getEmail() + ". Keycloak says: " + body
+                                ))
+                )
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        resp -> resp.bodyToMono(String.class)
+                                .map(body -> new KeycloakException("Keycloak rejected user creation: " + body))
+                )
                 .toBodilessEntity()
                 .map(response -> {
-                    String location = response.getHeaders().getLocation().toString();
-                    return location.substring(location.lastIndexOf('/') + 1);
+                    URI location = response.getHeaders().getLocation();
+                    if (location == null) {
+                        throw new KeycloakException("Keycloak did not return Location header for created user");
+                    }
+                    return location.toString().substring(location.toString().lastIndexOf('/') + 1);
                 })
                 .block();
 
-        log.info("User created in Keycloak with ID: {} and email: {}", userId, userDto.getEmail());
+        log.info("User with email {} created in Keycloak with ID: {}", userDto.getEmail(), userId);
 
         if (roles != null && !roles.isEmpty()) {
             assignRolesToUser(userId, roles);
@@ -80,6 +100,7 @@ public class KeycloakUserService {
 
         return userId;
     }
+
 //    В Keycloak роль должна существовать заранее:
 //    либо вручную в админке
 //    либо через миграцию Keycloak
@@ -90,20 +111,24 @@ public class KeycloakUserService {
         log.info("Assigning roles {} to user {}", roles, userId);
 
         // 1. Get all roles by names
-        List<Map<String, Object>> roleRepresentations = roles.stream()
-                .map(roleName ->
-                        keycloakWebClient
-                                .get()
-                                .uri("/roles/{roleName}", roleName)
-                                .retrieve()
-                                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
-                                })
-                                .block()
-                )
-                .toList();
+        List<Map<String, Object>> roleRepresentations = new ArrayList<>();
+        for (String roleName : roles) {
+            Map<String, Object> role = adminWebClient
+                    .get()
+                    .uri("/roles/{roleName}", roleName)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, resp ->
+                            Mono.error(new RoleNotFoundException("Role not found: " + roleName))
+                    )
+                    .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
+                    })
+                    .block();
+
+            roleRepresentations.add(role);
+        }
 
         // 2. Assign roles
-        keycloakWebClient
+        adminWebClient
                 .post()
                 .uri("/users/{id}/role-mappings/realm", userId)
                 .bodyValue(roleRepresentations)
@@ -130,11 +155,15 @@ public class KeycloakUserService {
         payload.put("username", userDto.getUsername());
         payload.put("enabled", true);
 
-        keycloakWebClient
+        adminWebClient
                 .put()
                 .uri("/users/{id}", userId)
                 .bodyValue(payload)
                 .retrieve()
+                .onStatus(HttpStatusCode::isError,
+                        resp -> resp.bodyToMono(String.class)
+                                .map(body -> new KeycloakException("Failed to update user: " + body))
+                )
                 .toBodilessEntity()
                 .block();
 
@@ -147,11 +176,15 @@ public class KeycloakUserService {
                     "temporary", false
             );
 
-            keycloakWebClient
+            adminWebClient
                     .put()
                     .uri("/users/{id}/reset-password", userId)
                     .bodyValue(passwordPayload)
                     .retrieve()
+                    .onStatus(HttpStatusCode::isError,
+                            resp -> resp.bodyToMono(String.class)
+                                    .map(body -> new KeycloakException("Failed to reset password: " + body))
+                    )
                     .toBodilessEntity()
                     .block();
         }
@@ -161,10 +194,15 @@ public class KeycloakUserService {
 
     public void deleteKeycloakUser(String userId) {
         log.info("Deleting Keycloak user {}", userId);
-        keycloakWebClient
+
+        adminWebClient
                 .delete()
                 .uri("/users/{id}", userId)
                 .retrieve()
+                .onStatus(HttpStatusCode::isError,
+                        resp -> resp.bodyToMono(String.class)
+                                .map(body -> new KeycloakException("Failed to delete user: " + body))
+                )
                 .toBodilessEntity()
                 .block();
 

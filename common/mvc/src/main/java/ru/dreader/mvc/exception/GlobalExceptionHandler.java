@@ -103,5 +103,19 @@ public class GlobalExceptionHandler {
         log.error("User not found", ex);
         return build(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(UserAlreadyExistsException ex,
+                                                                     HttpServletRequest request) {
+        log.error("User already exists", ex);
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(KeycloakException.class)
+    public ResponseEntity<ErrorResponse> handleKeycloakException(KeycloakException ex,
+                                                                     HttpServletRequest request) {
+        log.error("Keycloak error", ex);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), request);
+    }
 }
 
