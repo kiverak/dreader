@@ -4,22 +4,23 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import dto.UserInfo;
+import ru.dreader.dreadernews.security.CurrentUserContext;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserInfoService {
 
-    private final WebClient userWebClient;
+    private final CurrentUserContext currentUserContext;
     private final WebClient serviceWebClient;
 
-    // user request
+    // from context
     public UserInfo getCurrentUserInfo() {
-        return userWebClient
-                .get()
-                .uri("localhost:8765/users/api/user")
-                .retrieve()
-                .bodyToMono(UserInfo.class)
-                .block();
+        UserInfo userInfo = new UserInfo();
+        userInfo.setId(currentUserContext.getUserId());
+        userInfo.setUsername(currentUserContext.getUsername());
+        userInfo.setEmail(currentUserContext.getEmail());
+
+        return userInfo;
     }
 
     // service request
