@@ -1,10 +1,10 @@
 package dreadernewsparser.service;
 
-import dto.SourceDetails;
 import dreadernewsparser.entity.Source;
 import dreadernewsparser.entity.Tag;
 import dreadernewsparser.mapper.SourceMapper;
 import dreadernewsparser.repo.SourceRepository;
+import dto.SourceDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,11 +38,7 @@ public class SourceService {
 
     @Transactional
     public SourceDetails save(SourceDetails sourceDetails) {
-        List<Tag> tags = sourceDetails.defaultTags().stream()
-                .map(tagService::getOrCreate)
-                .collect(Collectors.toList());
-        
-        Source source = sourceMapper.toEntity(sourceDetails, tags);
+        Source source = sourceMapper.toEntity(sourceDetails);
         Source savedSource = sourceRepository.save(source);
         return sourceMapper.toDto(savedSource);
     }
@@ -54,7 +50,7 @@ public class SourceService {
                     List<Tag> tags = sourceDetails.defaultTags().stream()
                             .map(tagService::getOrCreate)
                             .collect(Collectors.toList());
-                    
+
                     sourceMapper.updateEntity(source, sourceDetails, tags);
                     Source updatedSource = sourceRepository.save(source);
                     return sourceMapper.toDto(updatedSource);

@@ -1,11 +1,11 @@
 package ru.dreader.dreadernews.mapper;
 
-import lombok.RequiredArgsConstructor;
 import dto.SourceDetails;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import ru.dreader.dreadernews.entity.Source;
 import ru.dreader.dreadernews.entity.Tag;
-import org.springframework.stereotype.Component;
-import ru.dreader.dreadernews.repo.TagRepository;
+import ru.dreader.dreadernews.service.TagService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SourceMapper {
 
-    private final TagRepository tagRepository;
+    private final TagService tagService;
 
     public Source toEntity(SourceDetails sourceDetails) {
         if (sourceDetails == null) {
@@ -24,17 +24,13 @@ public class SourceMapper {
         }
 
         Source source = new Source();
+        source.setId(sourceDetails.id());
         source.setName(sourceDetails.name());
         source.setUrl(sourceDetails.url());
 
         List<Tag> defaultTags = new ArrayList<>();
         sourceDetails.defaultTags().forEach(tagName -> {
-            Tag tag = tagRepository.findByName(tagName)
-                    .orElseGet(() -> {
-                        Tag newTag = new Tag();
-                        newTag.setName(tagName);
-                        return tagRepository.save(newTag);
-                    });
+            Tag tag = tagService.getOrCreate(tagName);
             defaultTags.add(tag);
         });
         source.setDefaultTags(defaultTags);
@@ -65,13 +61,5 @@ public class SourceMapper {
                 tagNames
         );
     }
-    
-    public void updateEntity(Source source, SourceDetails sourceDetails, List<Tag> defaultTags) {
-        if (sourceDetails == null || source == null) {
-            return;
-        }
-        source.setName(sourceDetails.name());
-        source.setUrl(sourceDetails.url());
-        source.setDefaultTags(defaultTags);
-    }
+
 }
