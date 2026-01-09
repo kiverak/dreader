@@ -1,7 +1,7 @@
 package dreadernewsparser.controller;
 
-import dreadernewsparser.dto.ArticleDto;
 import dreadernewsparser.service.ArticleService;
+import dto.ArticleDto;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

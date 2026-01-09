@@ -1,10 +1,10 @@
 package ru.dreader.dreadernews.job;
 
+import dto.ArticleDto;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
-import ru.dreader.dreadernews.dto.ArticleDto;
 import org.springframework.stereotype.Service;
-import ru.dreader.dreadernews.dto.SourceDetails;
+import dto.SourceDetails;
 import ru.dreader.dreadernews.service.SourceService;
 import ru.dreader.dreadernews.web.NewsParserClient;
 import ru.dreader.dreadernews.service.ArticleService;

@@ -2,7 +2,7 @@ package ru.dreader.dreadernews.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.dreader.dreadernews.dto.SourceDetails;
+import dto.SourceDetails;
 import ru.dreader.dreadernews.service.SourceService;
 
 import java.util.List;

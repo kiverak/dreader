@@ -1,8 +1,8 @@
 package ru.dreader.dreadernews.mapper;
 
+import dto.ArticleDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.dreader.dreadernews.dto.ArticleDto;
 import ru.dreader.dreadernews.entity.Article;
 import ru.dreader.dreadernews.entity.Source;
 import ru.dreader.dreadernews.entity.Tag;
@@ -78,6 +78,7 @@ public class ArticleMapper {
                 Collections.emptyList();
 
         return new ArticleDto(
+                article.getId(),
                 article.getUrl(),
                 article.getTitle(),
                 article.getSource().getName(),

@@ -1,10 +1,10 @@
 package dreadernewsparser.mapper;
 
-import dreadernewsparser.dto.ArticleDto;
 import dreadernewsparser.entity.Article;
 import dreadernewsparser.entity.Source;
 import dreadernewsparser.entity.Tag;
 import dreadernewsparser.service.TagService;
+import dto.ArticleDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -59,6 +59,7 @@ public class ArticleMapper {
                 Collections.emptyList();
 
         return new ArticleDto(
+                article.getId(),
                 article.getUrl(),
                 article.getTitle(),
                 article.getSource().getName(),

@@ -1,5 +1,6 @@
 package ru.dreader.dreadernews.service;
 
+import dto.ArticleDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -7,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.dreader.dreadernews.dto.ArticleDto;
 import ru.dreader.dreadernews.entity.Article;
 import ru.dreader.dreadernews.mapper.ArticleMapper;
 import ru.dreader.dreadernews.repo.ArticleRepository;

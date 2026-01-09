@@ -1,11 +1,11 @@
 package ru.dreader.dreadernews.web;
 
+import dto.ArticleDto;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import ru.dreader.dreadernews.dto.ArticleDto;
-import ru.dreader.dreadernews.dto.SourceDetails;
+import dto.SourceDetails;
 
 import java.util.List;
 

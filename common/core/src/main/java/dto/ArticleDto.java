@@ -1,9 +1,10 @@
-package ru.dreader.dreadernews.dto;
+package dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public record ArticleDto(
+        Long id,
         String url,
         String title,
         String sourceName,

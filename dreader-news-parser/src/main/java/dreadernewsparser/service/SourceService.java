@@ -1,6 +1,6 @@
 package dreadernewsparser.service;
 
-import dreadernewsparser.dto.SourceDetails;
+import dto.SourceDetails;
 import dreadernewsparser.entity.Source;
 import dreadernewsparser.entity.Tag;
 import dreadernewsparser.mapper.SourceMapper;

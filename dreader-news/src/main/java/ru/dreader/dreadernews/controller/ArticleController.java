@@ -1,8 +1,8 @@
 package ru.dreader.dreadernews.controller;
 
+import dto.ArticleDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.dreader.dreadernews.dto.ArticleDto;
 import ru.dreader.dreadernews.service.ArticleService;
 
 import java.util.List;

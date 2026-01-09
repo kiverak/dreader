@@ -1,10 +1,10 @@
 package dreadernewsparser.service;
 
 import dreadernewsparser.dto.ArticleSourcePair;
-import dreadernewsparser.dto.ArticleDto;
 import dreadernewsparser.entity.Article;
 import dreadernewsparser.mapper.ArticleMapper;
 import dreadernewsparser.repo.ArticleRepository;
+import dto.ArticleDto;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

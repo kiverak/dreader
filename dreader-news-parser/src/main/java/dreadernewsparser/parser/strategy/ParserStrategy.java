@@ -1,8 +1,8 @@
 package dreadernewsparser.parser.strategy;
 
 import dreadernewsparser.config.HttpClientConfig;
-import dreadernewsparser.dto.ArticleDto;
 import dreadernewsparser.entity.Source;
+import dto.ArticleDto;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
@@ -17,6 +17,7 @@ public interface ParserStrategy {
         Document doc = httpClientConfig.prepareRequest(url).get();
 
         return new ArticleDto(
+                null,
                 url,
                 getTitle(doc),
                 source.getName(),

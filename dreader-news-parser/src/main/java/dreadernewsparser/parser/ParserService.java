@@ -1,9 +1,9 @@
 package dreadernewsparser.parser;
 
 import dreadernewsparser.config.HttpClientConfig;
-import dreadernewsparser.dto.ArticleDto;
 import dreadernewsparser.entity.Source;
 import dreadernewsparser.parser.strategy.ParserStrategy;
+import dto.ArticleDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

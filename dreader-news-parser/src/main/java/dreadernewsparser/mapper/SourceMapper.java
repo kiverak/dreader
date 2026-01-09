@@ -1,6 +1,6 @@
 package dreadernewsparser.mapper;
 
-import dreadernewsparser.dto.SourceDetails;
+import dto.SourceDetails;
 import dreadernewsparser.entity.Source;
 import dreadernewsparser.entity.Tag;
 import org.springframework.stereotype.Component;

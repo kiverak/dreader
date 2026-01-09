@@ -1,6 +1,6 @@
 package dreadernewsparser.controller;
 
-import dreadernewsparser.dto.SourceDetails;
+import dto.SourceDetails;
 import dreadernewsparser.service.SourceService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

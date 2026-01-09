@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.dreader.dreadernews.dto.SourceDetails;
+import dto.SourceDetails;
 import ru.dreader.dreadernews.entity.Source;
 import ru.dreader.dreadernews.entity.Tag;
 import ru.dreader.dreadernews.mapper.SourceMapper;

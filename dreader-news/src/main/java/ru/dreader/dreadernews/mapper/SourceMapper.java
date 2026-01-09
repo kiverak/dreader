@@ -1,7 +1,7 @@
 package ru.dreader.dreadernews.mapper;
 
 import lombok.RequiredArgsConstructor;
-import ru.dreader.dreadernews.dto.SourceDetails;
+import dto.SourceDetails;
 import ru.dreader.dreadernews.entity.Source;
 import ru.dreader.dreadernews.entity.Tag;
 import org.springframework.stereotype.Component;
@@ -59,6 +59,7 @@ public class SourceMapper {
                 Collections.emptyList();
 
         return new SourceDetails(
+                source.getId(),
                 source.getName(),
                 source.getUrl(),
                 tagNames
