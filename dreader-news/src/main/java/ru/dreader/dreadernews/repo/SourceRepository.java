@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface SourceRepository extends JpaRepository<Source, Long> {
     Optional<Source> findByName(String name);
 
-    @Query(value = "SELECT * FROM source WHERE name IN :sourceNames", nativeQuery = true)
+    @Query("SELECT s FROM Source s WHERE s.name IN :sourceNames")
     List<Source> findAllBySourceNames(@Param("sourceNames") List<String> sourceNames);
+
 }

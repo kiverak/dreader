@@ -1,7 +1,7 @@
 package dreadernewsparser.parser;
 
 import dreadernewsparser.config.HttpClientConfig;
-import dreadernewsparser.dto.NewsArticle;
+import dreadernewsparser.dto.ArticleDto;
 import dreadernewsparser.entity.Source;
 import dreadernewsparser.parser.strategy.ParserStrategy;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ public class ParserService {
     private final List<ParserStrategy> strategies;
     private final HttpClientConfig httpClientConfig;
 
-    public NewsArticle parse(String url, Source source) throws IOException {
+    public ArticleDto parse(String url, Source source) throws IOException {
         return getStrategy(source).parse(httpClientConfig, url, source);
     }
 

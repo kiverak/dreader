@@ -1,7 +1,7 @@
 package dreadernewsparser.job;
 
 import dreadernewsparser.dto.ArticleSourcePair;
-import dreadernewsparser.dto.NewsArticle;
+import dreadernewsparser.dto.ArticleDto;
 import dreadernewsparser.entity.Source;
 import dreadernewsparser.parser.ParserService;
 import dreadernewsparser.service.ArticleService;
@@ -88,7 +88,7 @@ public class ScheduledNewsParser {
                     List<String> urls = parserService.findNewArticles(source);
                     for (String url : urls) {
                         try {
-                            NewsArticle article = parserService.parse(url, source);
+                            ArticleDto article = parserService.parse(url, source);
                             // Ключевой момент: producer может ждать
                             articlesQueue.put(new ArticleSourcePair(article, source));
                             log.info("Queued: {} from {}", article.title(), source.getName());

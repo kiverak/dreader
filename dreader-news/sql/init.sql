@@ -27,7 +27,6 @@ CREATE TABLE IF NOT EXISTS article
     image_url        VARCHAR(255),
     source_id        BIGINT REFERENCES source (id),
     publication_date TIMESTAMP,
-    pushed           BOOLEAN DEFAULT FALSE,
     created_at       TIMESTAMP    NOT NULL,
     updated_at       TIMESTAMP
 );

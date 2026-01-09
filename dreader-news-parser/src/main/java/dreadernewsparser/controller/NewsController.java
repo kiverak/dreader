@@ -1,6 +1,6 @@
 package dreadernewsparser.controller;
 
-import dreadernewsparser.dto.NewsArticle;
+import dreadernewsparser.dto.ArticleDto;
 import dreadernewsparser.service.ArticleService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +19,7 @@ public class NewsController {
     private final ArticleService articleService;
 
     @GetMapping()
-    public List<NewsArticle> getNewsBatch() {
+    public List<ArticleDto> getNewsBatch() {
         return articleService.getNewArticles(NEWS_BATCH_SIZE);
     }
 }

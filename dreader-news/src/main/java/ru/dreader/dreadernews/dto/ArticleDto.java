@@ -6,6 +6,7 @@ import java.util.List;
 public record ArticleDto(
         String url,
         String title,
+        String sourceName,
         Integer viewsCount,
         Integer commentsCount,
         String content,

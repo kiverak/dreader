@@ -110,4 +110,9 @@ public class SourceService {
 
         newsParserClient.deleteSource(id);
     }
+
+    @Transactional(readOnly = true)
+    public List<Source> findAllBySourceNames(List<String> sourceNames) {
+        return sourceRepository.findAllBySourceNames(sourceNames);
+    }
 }

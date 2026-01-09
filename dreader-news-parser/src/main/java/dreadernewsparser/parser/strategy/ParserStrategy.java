@@ -1,7 +1,7 @@
 package dreadernewsparser.parser.strategy;
 
 import dreadernewsparser.config.HttpClientConfig;
-import dreadernewsparser.dto.NewsArticle;
+import dreadernewsparser.dto.ArticleDto;
 import dreadernewsparser.entity.Source;
 import org.jsoup.nodes.Document;
 
@@ -13,13 +13,13 @@ public interface ParserStrategy {
     boolean supports(Source source);
     List<String> findNewArticles(Source source) throws IOException;
 
-    default NewsArticle parse(HttpClientConfig httpClientConfig, String url, Source source) throws IOException {
+    default ArticleDto parse(HttpClientConfig httpClientConfig, String url, Source source) throws IOException {
         Document doc = httpClientConfig.prepareRequest(url).get();
 
-        return new NewsArticle(
-                source.getId(),
+        return new ArticleDto(
                 url,
                 getTitle(doc),
+                source.getName(),
                 getViewsCount(doc),
                 getCommentsCount(doc),
                 getContent(doc),

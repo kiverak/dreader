@@ -1,7 +1,7 @@
 package dreadernewsparser.service;
 
 import dreadernewsparser.dto.ArticleSourcePair;
-import dreadernewsparser.dto.NewsArticle;
+import dreadernewsparser.dto.ArticleDto;
 import dreadernewsparser.entity.Article;
 import dreadernewsparser.mapper.ArticleMapper;
 import dreadernewsparser.repo.ArticleRepository;
@@ -27,19 +27,19 @@ public class ArticleService {
     @Transactional
     public int saveAll(List<ArticleSourcePair> batch) {
         List<String> urls = batch.stream()
-                .map(ArticleSourcePair::newsArticle)
-                .map(NewsArticle::url)
+                .map(ArticleSourcePair::articleDto)
+                .map(ArticleDto::url)
                 .toList();
 
         Set<String> existing = articleRepository.findExistingUrls(urls);
 
         List<ArticleSourcePair> filtered = batch.stream()
-                .filter(e -> !existing.contains(e.newsArticle().url()))
+                .filter(e -> !existing.contains(e.articleDto().url()))
                 .toList();
 
         List<Article> articles = new ArrayList<>();
         for (ArticleSourcePair pair : filtered) {
-            Article article = articleMapper.toEntity(pair.newsArticle(), pair.source());
+            Article article = articleMapper.toEntity(pair.articleDto(), pair.source());
             articles.add(article);
         }
 
@@ -47,7 +47,7 @@ public class ArticleService {
     }
 
     @Transactional
-    public List<NewsArticle> getNewArticles(int batchSize) {
+    public List<ArticleDto> getNewArticles(int batchSize) {
         List<Article> articles = articleRepository.findUnpostedWithLimit(batchSize);
         for (Article a : articles) {
             a.setPushed(true);

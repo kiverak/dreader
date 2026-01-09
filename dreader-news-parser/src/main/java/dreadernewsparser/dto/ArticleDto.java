@@ -3,10 +3,10 @@ package dreadernewsparser.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record NewsArticle(
-        Long id,
+public record ArticleDto(
         String url,
         String title,
+        String sourceName,
         Integer viewsCount,
         Integer commentsCount,
         String content,

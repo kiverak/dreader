@@ -48,8 +48,6 @@ public class Article {
     )
     private List<Tag> tags;
 
-    private boolean pushed = false;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
