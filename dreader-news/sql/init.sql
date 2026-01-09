@@ -1,7 +1,12 @@
 CREATE TABLE IF NOT EXISTS tag
 (
     id   BIGSERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE
+    name VARCHAR(255) NOT NULL UNIQUE,
+    created_at       TIMESTAMP    NOT NULL DEFAULT now(),
+    updated_at       TIMESTAMP,
+    created_by       UUID,
+    updated_by       UUID,
+    version          BIGINT     NOT NULL    DEFAULT 1
 );
 
 CREATE INDEX IF NOT EXISTS idx_tag_name_hash ON tag USING hash (name);
@@ -10,7 +15,12 @@ CREATE TABLE IF NOT EXISTS source
 (
     id   BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
-    url  VARCHAR(255) NOT NULL UNIQUE
+    url  VARCHAR(255) NOT NULL UNIQUE,
+    created_at       TIMESTAMP    NOT NULL  DEFAULT now(),
+    updated_at       TIMESTAMP,
+    created_by       UUID,
+    updated_by       UUID,
+    version          BIGINT     NOT NULL    DEFAULT 1
 );
 
 CREATE INDEX IF NOT EXISTS idx_source_name_hash ON source USING hash (name);
@@ -27,8 +37,11 @@ CREATE TABLE IF NOT EXISTS article
     image_url        VARCHAR(255),
     source_id        BIGINT REFERENCES source (id),
     publication_date TIMESTAMP,
-    created_at       TIMESTAMP    NOT NULL,
-    updated_at       TIMESTAMP
+    created_at       TIMESTAMP    NOT NULL DEFAULT now(),
+    updated_at       TIMESTAMP,
+    created_by       UUID,
+    updated_by       UUID,
+    version          BIGINT     NOT NULL    DEFAULT 1
 );
 
 CREATE INDEX IF NOT EXISTS idx_article_url_hash ON article USING hash (url);

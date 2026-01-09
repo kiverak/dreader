@@ -3,6 +3,7 @@ package ru.dreader.dreadernews.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import ru.dreader.mvc.entity.AuditEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,10 +13,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Table(name = "article")
-public class Article {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Article extends AuditEntity {
 
     @Column(nullable = false)
     private String title;
@@ -42,38 +40,21 @@ public class Article {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-        name = "article_tag",
-        joinColumns = @JoinColumn(name = "article_id"),
-        inverseJoinColumns = @JoinColumn(name = "tag_id")
+            name = "article_tag",
+            joinColumns = @JoinColumn(name = "article_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<Tag> tags;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Article article = (Article) o;
-        return Objects.equals(id, article.id) && Objects.equals(url, article.url);
+        return Objects.equals(this.getId(), article.getId()) && Objects.equals(url, article.url);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, url);
+        return Objects.hash(this.getId(), url);
     }
 }

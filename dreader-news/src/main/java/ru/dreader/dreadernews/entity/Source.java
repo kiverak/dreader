@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
+import ru.dreader.mvc.entity.AuditEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "source")
-public class Source {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Source extends AuditEntity {
 
     @Column(nullable = false, unique = true)
     private String name;
@@ -36,7 +34,7 @@ public class Source {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Source source)) return false;
-        return id != null && id.equals(source.getId());
+        return this.getId() != null && this.getId().equals(source.getId());
     }
 
     @Override

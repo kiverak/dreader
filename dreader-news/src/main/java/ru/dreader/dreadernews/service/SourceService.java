@@ -11,9 +11,7 @@ import ru.dreader.dreadernews.mapper.SourceMapper;
 import ru.dreader.dreadernews.repo.SourceRepository;
 import ru.dreader.dreadernews.web.NewsParserClient;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -58,17 +56,37 @@ public class SourceService {
         for (Source source : existingSources) {
             SourceDetails details = detailsByName.get(source.getName());
 
-            source.setUrl(details.url());
-            List<Tag> tags = tagService.getOrCreateByNames(details.defaultTags());
-            source.setDefaultTags(tags);
+            // Проверяем URL
+            if (!Objects.equals(source.getUrl(), details.url())) {
+                source.setUrl(details.url());
+            }
+
+            // Проверяем теги
+            List<Tag> newTags = tagService.getOrCreateByNames(details.defaultTags());
+            if (!equalTags(source.getDefaultTags(), newTags)) {
+                source.setDefaultTags(newTags);
+            }
 
             detailsByName.remove(source.getName());
         }
 
+        // Добавляем новые источники
         if (!detailsByName.isEmpty()) {
-            saveAll(new ArrayList<>(detailsByName.values()));
+            List<Source> sources = sourceMapper.toEntity(new ArrayList<>(detailsByName.values()));
+            sourceRepository.saveAll(sources);
             log.info("{} new sources saved", detailsByName.size());
         }
+    }
+
+    private boolean equalTags(List<Tag> oldTags, List<Tag> newTags) {
+        if (oldTags.size() != newTags.size()) {
+            return false;
+        }
+
+        Set<Long> oldIds = oldTags.stream().map(Tag::getId).collect(Collectors.toSet());
+        Set<Long> newIds = newTags.stream().map(Tag::getId).collect(Collectors.toSet());
+
+        return oldIds.equals(newIds);
     }
 
     @Transactional

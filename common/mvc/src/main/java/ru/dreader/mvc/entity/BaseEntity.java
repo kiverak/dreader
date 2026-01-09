@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @MappedSuperclass
 @Getter
@@ -21,20 +21,22 @@ public abstract class BaseEntity {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @LastModifiedDate
     @Column(nullable = false)
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        createdAt = Instant.now();
         updatedAt = createdAt;
+        version = 1L;
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = Instant.now();
+        version++;
     }
 }
