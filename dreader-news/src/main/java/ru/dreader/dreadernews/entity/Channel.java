@@ -1,5 +1,6 @@
 package ru.dreader.dreadernews.entity;
 
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Type;
@@ -27,10 +28,13 @@ public class Channel extends AuditEntity {
     @Column(nullable = false, length = 32)
     private Platform platform;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String name;
 
-    @Type(type = "jsonb")
+    @Type(JsonType.class)
     @Column(columnDefinition = "jsonb", nullable = false)
     private Map<String, String> credentials;
+
+    @Column(nullable = false)
+    private int minUpdatePeriodInMinutes = 30;
 }

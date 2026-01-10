@@ -33,4 +33,3 @@ public class PostMedia extends BaseEntity {
     @Column(nullable = false)
     private Integer position;
 }
-

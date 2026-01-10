@@ -12,8 +12,8 @@ import ru.dreader.mvc.entity.AuditEntity;
 public class Comment extends AuditEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "news_id", nullable = false)
-    private News news;
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
@@ -22,4 +22,3 @@ public class Comment extends AuditEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 }
-
