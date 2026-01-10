@@ -1,3 +1,5 @@
+-- PARSING ARTICLES
+
 CREATE TABLE IF NOT EXISTS tag
 (
     id         BIGSERIAL PRIMARY KEY,
@@ -48,17 +50,19 @@ CREATE INDEX IF NOT EXISTS idx_article_url_hash ON article USING hash (url);
 
 CREATE TABLE IF NOT EXISTS article_tag
 (
-    article_id BIGINT NOT NULL REFERENCES article (id),
-    tag_id     BIGINT NOT NULL REFERENCES tag (id),
+    article_id BIGINT NOT NULL REFERENCES article (id) ON DELETE CASCADE,
+    tag_id     BIGINT NOT NULL REFERENCES tag (id) ON DELETE CASCADE,
     PRIMARY KEY (article_id, tag_id)
 );
 
 CREATE TABLE IF NOT EXISTS source_default_tags
 (
-    source_id BIGINT NOT NULL REFERENCES source (id),
-    tag_id    BIGINT NOT NULL REFERENCES tag (id),
+    source_id BIGINT NOT NULL REFERENCES source (id) ON DELETE CASCADE,
+    tag_id    BIGINT NOT NULL REFERENCES tag (id) ON DELETE CASCADE,
     PRIMARY KEY (source_id, tag_id)
 );
+
+-- INIT
 
 INSERT INTO tag (name)
 VALUES ('ai'),
@@ -90,7 +94,7 @@ FROM source s
 WHERE s.name = '3DNews'
 ON CONFLICT DO NOTHING;
 
-
+-- PUBLISHING POSTS
 
 CREATE TABLE channel
 (
@@ -138,3 +142,12 @@ CREATE TABLE publish_result
     error_message TEXT,
     published_at  TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_channel_platform ON channel(platform);
+CREATE INDEX IF NOT EXISTS idx_channel_name ON channel(name);
+CREATE INDEX IF NOT EXISTS idx_post_status ON post(status);
+CREATE INDEX IF NOT EXISTS idx_post_scheduled_at ON post(scheduled_at);
+CREATE INDEX IF NOT EXISTS idx_post_media_post_id ON post_media(post_id);
+CREATE INDEX IF NOT EXISTS idx_publish_result_post_id ON publish_result(post_id);
+CREATE INDEX IF NOT EXISTS idx_publish_result_channel_id ON publish_result(channel_id);
+CREATE INDEX IF NOT EXISTS idx_publish_result_success ON publish_result(success);
