@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import ru.dreader.dreadernews.entity.Post;
+import ru.dreader.dreadernews.repo.PostRepository;
 import ru.dreader.dreadernews.service.PostPublishingService;
 
 import java.util.List;

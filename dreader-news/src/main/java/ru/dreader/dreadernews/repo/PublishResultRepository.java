@@ -1,10 +1,9 @@
 package ru.dreader.dreadernews.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import ru.dreader.dreadernews.entity.Channel;
+import ru.dreader.dreadernews.entity.PublishResult;
 
-@Repository
-public interface ChannelRepository extends JpaRepository<Channel, Long> {
+public interface PublishResultRepository extends JpaRepository<PublishResult, Long> {
 
 }

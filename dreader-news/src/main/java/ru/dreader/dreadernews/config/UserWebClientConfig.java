@@ -15,7 +15,7 @@ WebClient для фронтового доступа
 умеет fallback‑ить к SecurityContext
  */
 @Configuration
-public class WebClientConfig {
+public class UserWebClientConfig {
 
     @Bean
     @LoadBalanced
