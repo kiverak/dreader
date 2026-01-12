@@ -7,7 +7,10 @@ CREATE TABLE channel
     name        VARCHAR(255) NOT NULL,
     credentials JSONB        NOT NULL,
     created_at  TIMESTAMP    NOT NULL DEFAULT NOW(),
-    updated_at  TIMESTAMP    NOT NULL DEFAULT NOW()
+    updated_at  TIMESTAMP    NOT NULL DEFAULT NOW(),
+    created_by  UUID,
+    updated_by  UUID,
+    version     BIGINT       NOT NULL DEFAULT 1
 );
 
 CREATE TABLE post
@@ -17,16 +20,22 @@ CREATE TABLE post
     scheduled_at TIMESTAMP,
     status       VARCHAR(32) NOT NULL,
     created_at   TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at   TIMESTAMP   NOT NULL DEFAULT NOW()
+    updated_at   TIMESTAMP   NOT NULL DEFAULT NOW(),
+    created_by   UUID,
+    updated_by   UUID,
+    version      BIGINT      NOT NULL DEFAULT 1
 );
 
 CREATE TABLE post_media
 (
-    id       BIGSERIAL PRIMARY KEY,
-    post_id  BIGINT      NOT NULL REFERENCES post (id) ON DELETE CASCADE,
-    type     VARCHAR(32) NOT NULL,
-    url      TEXT        NOT NULL,
-    position INT         NOT NULL DEFAULT 0
+    id         BIGSERIAL PRIMARY KEY,
+    post_id    BIGINT      NOT NULL REFERENCES post (id) ON DELETE CASCADE,
+    type       VARCHAR(32) NOT NULL,
+    url        TEXT        NOT NULL,
+    position   INT         NOT NULL DEFAULT 0,
+    created_by UUID,
+    updated_by UUID,
+    version    BIGINT      NOT NULL DEFAULT 1
 );
 
 CREATE TABLE post_channel
@@ -44,20 +53,23 @@ CREATE TABLE publish_result
     success       BOOLEAN   NOT NULL,
     external_id   VARCHAR(255),
     error_message TEXT,
-    published_at  TIMESTAMP NOT NULL DEFAULT NOW()
+    published_at  TIMESTAMP NOT NULL DEFAULT NOW(),
+    created_by    UUID,
+    updated_by    UUID,
+    version       BIGINT    NOT NULL DEFAULT 1
 );
 
 
 -- INDEXES
 
-CREATE INDEX IF NOT EXISTS idx_channel_platform ON channel(platform);
-CREATE INDEX IF NOT EXISTS idx_channel_name ON channel(name);
+CREATE INDEX IF NOT EXISTS idx_channel_platform ON channel (platform);
+CREATE INDEX IF NOT EXISTS idx_channel_name ON channel (name);
 
-CREATE INDEX IF NOT EXISTS idx_post_status ON post(status);
-CREATE INDEX IF NOT EXISTS idx_post_scheduled_at ON post(scheduled_at);
+CREATE INDEX IF NOT EXISTS idx_post_status ON post (status);
+CREATE INDEX IF NOT EXISTS idx_post_scheduled_at ON post (scheduled_at);
 
-CREATE INDEX IF NOT EXISTS idx_post_media_post_id ON post_media(post_id);
+CREATE INDEX IF NOT EXISTS idx_post_media_post_id ON post_media (post_id);
 
-CREATE INDEX IF NOT EXISTS idx_publish_result_post_id ON publish_result(post_id);
-CREATE INDEX IF NOT EXISTS idx_publish_result_channel_id ON publish_result(channel_id);
-CREATE INDEX IF NOT EXISTS idx_publish_result_success ON publish_result(success);
+CREATE INDEX IF NOT EXISTS idx_publish_result_post_id ON publish_result (post_id);
+CREATE INDEX IF NOT EXISTS idx_publish_result_channel_id ON publish_result (channel_id);
+CREATE INDEX IF NOT EXISTS idx_publish_result_success ON publish_result (success);
