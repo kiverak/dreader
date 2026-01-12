@@ -6,7 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import dto.SourceDetails;
 import ru.dreader.dreadernews.service.SourceService;
-import ru.dreader.dreadernews.web.NewsParserClient;
+import ru.dreader.dreadernews.web.ArticleParserClient;
 import ru.dreader.dreadernews.service.ArticleService;
 
 import java.util.List;
@@ -16,23 +16,23 @@ import java.util.List;
 @Service
 public class ArticlesGetterScheduler {
 
-    private final NewsParserClient newsParserClient;
+    private final ArticleParserClient articleParserClient;
     private final ArticleService articleService;
     private final SourceService sourceService;
 
-    public ArticlesGetterScheduler(NewsParserClient newsParserClient, ArticleService articleService, SourceService sourceService) {
-        this.newsParserClient = newsParserClient;
+    public ArticlesGetterScheduler(ArticleParserClient articleParserClient, ArticleService articleService, SourceService sourceService) {
+        this.articleParserClient = articleParserClient;
         this.articleService = articleService;
         this.sourceService = sourceService;
     }
 
     @Scheduled(fixedRate = 5_000) // каждые 5 секунд
     public void getArticles() {
-        List<SourceDetails> allSources = newsParserClient.getAllSources();
+        List<SourceDetails> allSources = articleParserClient.getAllSources();
         sourceService.saveOrUpdateAll(allSources);
 
         log.info("Getting articles...");
-        List<ArticleDto> articleDTOs = newsParserClient.getNews();
+        List<ArticleDto> articleDTOs = articleParserClient.getNews();
         articleService.saveAll(articleDTOs);
         log.info("{} fresh articles saved", articleDTOs.size());
     }

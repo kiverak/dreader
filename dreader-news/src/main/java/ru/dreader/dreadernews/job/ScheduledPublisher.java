@@ -16,7 +16,7 @@ public class ScheduledPublisher {
     private final PostRepository postRepository;
     private final PostPublishingService publishingService;
 
-    @Scheduled(fixedDelay = 5000)
+//    @Scheduled(fixedDelay = 5000)
     public void processScheduledPosts() {
         List<Post> posts = postRepository.findReadyToPublish();
         posts.forEach(publishingService::publish);

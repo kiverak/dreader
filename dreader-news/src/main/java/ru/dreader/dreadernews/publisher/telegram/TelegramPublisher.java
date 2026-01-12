@@ -92,7 +92,8 @@ public class TelegramPublisher implements Publisher {
 
         Map<String, Object> payload = Map.of(
                 "chat_id", chatId,
-                "text", post.getText()
+                "text", post.getText(),
+                "parse_mode", "HTML"
         );
 
         TelegramResponse response = executeTelegramRequest(url, payload);
@@ -115,7 +116,8 @@ public class TelegramPublisher implements Publisher {
         Map<String, Object> payload = Map.of(
                 "chat_id", chatId,
                 "photo", media.getUrl(),
-                "caption", post.getText()
+                "caption", post.getText(),
+                "parse_mode", "HTML"
         );
 
         TelegramResponse response = executeTelegramRequest(url, payload);
@@ -143,6 +145,7 @@ public class TelegramPublisher implements Publisher {
             item.put("media", m.getUrl());
             if (i == 0 && post.getText() != null && !post.getText().isBlank()) {
                 item.put("caption", post.getText());
+                item.put("parse_mode", "HTML");
             }
             items.add(item);
         }

@@ -1,6 +1,6 @@
 package dto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 public record ArticleDto(
@@ -13,6 +13,7 @@ public record ArticleDto(
         String content,
         String shortContent,
         String imageUrl,
-        LocalDateTime publicationDate,
+        Instant publicationDate,
         List<String> tags
-) {}
+) {
+}

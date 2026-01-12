@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +39,7 @@ public class Article {
     @JoinColumn(name = "source_id")
     private Source source;
 
-    private LocalDateTime publicationDate;
+    private Instant publicationDate;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(

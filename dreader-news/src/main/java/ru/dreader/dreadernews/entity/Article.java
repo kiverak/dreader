@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.dreader.mvc.entity.AuditEntity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,7 +36,7 @@ public class Article extends AuditEntity {
     @JoinColumn(name = "source_id")
     private Source source;
 
-    private LocalDateTime publicationDate;
+    private Instant publicationDate;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
@@ -45,6 +45,8 @@ public class Article extends AuditEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<Tag> tags;
+
+    private boolean llmParsed = false;
 
     @Override
     public boolean equals(Object o) {

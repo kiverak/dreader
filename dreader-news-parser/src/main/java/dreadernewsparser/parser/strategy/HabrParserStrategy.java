@@ -10,6 +10,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -86,12 +87,12 @@ public class HabrParserStrategy implements ParserStrategy {
     }
 
     @Override
-    public LocalDateTime getPublicationDate(Document doc) {
+    public Instant getPublicationDate(Document doc) {
         String dateTimeStr = doc.select("meta[property=aiturec:datetime]").attr("content");
         if (dateTimeStr != null && !dateTimeStr.isEmpty()) {
-            return ZonedDateTime.parse(dateTimeStr).toLocalDateTime();
+            return ZonedDateTime.parse(dateTimeStr).toInstant();
         }
-        return LocalDateTime.now();
+        return Instant.now();
     }
 
     @Override

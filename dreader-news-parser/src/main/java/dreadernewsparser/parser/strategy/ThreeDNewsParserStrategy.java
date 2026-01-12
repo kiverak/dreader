@@ -12,6 +12,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -80,14 +81,14 @@ public class ThreeDNewsParserStrategy implements ParserStrategy {
     }
 
     @Override
-    public LocalDateTime getPublicationDate(Document doc) {
+    public Instant getPublicationDate(Document doc) {
         Elements scripts = doc.select("script[type=application/ld+json]");
         for (Element script : scripts) {
             try {
                 JsonNode node = objectMapper.readTree(script.data());
                 if (node.has("datePublished")) {
                     String date = node.get("datePublished").asText();
-                    return ZonedDateTime.parse(date).toLocalDateTime();
+                    return ZonedDateTime.parse(date).toInstant();
                 }
             } catch (Exception e) {
                 // Игнорируем ошибки парсинга и пробуем следующий способ
@@ -96,10 +97,10 @@ public class ThreeDNewsParserStrategy implements ParserStrategy {
 
         String dateTimeStr = doc.select("span[class=entry-date tttes]").attr("content");
         if (dateTimeStr != null && !dateTimeStr.isEmpty()) {
-            return ZonedDateTime.parse(dateTimeStr).toLocalDateTime();
+            return ZonedDateTime.parse(dateTimeStr).toInstant();
         }
 
-        return LocalDateTime.now();
+        return Instant.now();
     }
 
     @Override

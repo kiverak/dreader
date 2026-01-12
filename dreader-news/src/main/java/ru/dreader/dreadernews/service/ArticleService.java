@@ -51,4 +51,12 @@ public class ArticleService {
                 .map(articleMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    public Article getEarliestForDayReadyToPost() {
+        List<Article> list = articleRepository.findEarliestFor24HoursNotParsed(PageRequest.of(0, 1))
+                .stream()
+                .toList();
+
+        return list.isEmpty() ? null : list.getFirst();
+    }
 }

@@ -45,6 +45,13 @@ CREATE TABLE post_channel
     PRIMARY KEY (post_id, channel_id)
 );
 
+CREATE TABLE post_tag
+(
+    post_id BIGINT NOT NULL REFERENCES post (id) ON DELETE CASCADE,
+    tag_id  BIGINT NOT NULL REFERENCES tag (id) ON DELETE CASCADE,
+    PRIMARY KEY (post_id, tag_id)
+);
+
 CREATE TABLE publish_result
 (
     id            BIGSERIAL PRIMARY KEY,

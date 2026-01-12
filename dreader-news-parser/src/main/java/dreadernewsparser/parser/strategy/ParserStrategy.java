@@ -6,6 +6,7 @@ import dto.ArticleDto;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public interface ParserStrategy {
 
     String getImageUrl(Document doc);
 
-    LocalDateTime getPublicationDate(Document doc);
+    Instant getPublicationDate(Document doc);
 
     List<String> getTags(Document doc);
 }

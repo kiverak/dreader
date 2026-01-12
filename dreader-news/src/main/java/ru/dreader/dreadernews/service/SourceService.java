@@ -9,7 +9,7 @@ import ru.dreader.dreadernews.entity.Source;
 import ru.dreader.dreadernews.entity.Tag;
 import ru.dreader.dreadernews.mapper.SourceMapper;
 import ru.dreader.dreadernews.repo.SourceRepository;
-import ru.dreader.dreadernews.web.NewsParserClient;
+import ru.dreader.dreadernews.web.ArticleParserClient;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,7 +22,7 @@ public class SourceService {
     private final SourceRepository sourceRepository;
     private final TagService tagService;
     private final SourceMapper sourceMapper;
-    private final NewsParserClient newsParserClient;
+    private final ArticleParserClient articleParserClient;
 
     @Transactional(readOnly = true)
     public SourceDetails getById(Long id) {
@@ -97,7 +97,7 @@ public class SourceService {
         Source entity = sourceMapper.toEntity(sourceDetails);
         entity = sourceRepository.save(entity);
 
-        newsParserClient.createSource(sourceDetails);
+        articleParserClient.createSource(sourceDetails);
 
         return sourceMapper.toDto(entity);
     }
@@ -114,7 +114,7 @@ public class SourceService {
 
         source = sourceRepository.save(source);
 
-        newsParserClient.updateSource(id, sourceDetails);
+        articleParserClient.updateSource(id, sourceDetails);
 
         return sourceMapper.toDto(source);
     }
@@ -126,7 +126,7 @@ public class SourceService {
         }
         sourceRepository.deleteById(id);
 
-        newsParserClient.deleteSource(id);
+        articleParserClient.deleteSource(id);
     }
 
     @Transactional(readOnly = true)

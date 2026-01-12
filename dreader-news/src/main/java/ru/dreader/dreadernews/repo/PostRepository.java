@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.dreader.dreadernews.entity.Post;
-import ru.dreader.dreadernews.entity.PublishResult;
 
 import java.util.List;
 

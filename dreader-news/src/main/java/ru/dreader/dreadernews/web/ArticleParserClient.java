@@ -10,11 +10,11 @@ import dto.SourceDetails;
 import java.util.List;
 
 @Component
-public class NewsParserClient {
+public class ArticleParserClient {
 
     private final WebClient webClient;
 
-    public NewsParserClient(WebClient.Builder webClientBuilder) {
+    public ArticleParserClient(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl("http://localhost:8765/parser/api").build();
     }
 
