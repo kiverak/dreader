@@ -23,6 +23,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                     AND pr.success = true
                     AND pr.channel IN ELEMENTS(p.channels)
               )
+            ORDER BY p.scheduledAt ASC
             """)
     List<Post> findReadyToPublish();
 }

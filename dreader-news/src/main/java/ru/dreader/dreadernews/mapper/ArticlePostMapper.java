@@ -49,17 +49,13 @@ public class ArticlePostMapper {
 
         // Title as bold link
         textBuilder.append("<a href=\"").append(article.getUrl()).append("\">")
-                .append("<b>").append(response.title()).append("</b>")
-                .append("</a>").append("\n\n");
+                .append("<b>").append(article.getSource().getName()).append("</b>")
+                .append("</a>")
+                .append("<b>").append(": ").append(response.summary()).append("</b>").append("\n\n");
 
-        textBuilder.append(response.summary()).append("\n\n");
-
-        int maxCounter = 10;
         if (response.summaryBullets() != null) {
             for (String bullet : response.summaryBullets()) {
-                if (maxCounter > 10) break;
-                textBuilder.append("- ").append(bullet).append("\n");
-                maxCounter++;
+                textBuilder.append("– ").append(bullet).append("\n");
             }
         }
 

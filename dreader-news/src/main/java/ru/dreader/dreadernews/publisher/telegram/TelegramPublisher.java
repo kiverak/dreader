@@ -95,7 +95,8 @@ public class TelegramPublisher implements Publisher {
         Map<String, Object> payload = Map.of(
                 "chat_id", chatId,
                 "text", post.getText(),
-                "parse_mode", "HTML"
+                "parse_mode", "HTML",
+                "disable_web_page_preview", true
         );
 
         TelegramResponse response = executeTelegramRequest(url, payload);
