@@ -157,6 +157,6 @@ VALUES ('TELEGRAM',
         'dreader-test',
         '{
           "botToken": "8585153270:AAFwZLCwmMDv7TMABrwd8Qn_2GOxSFovINQ",
-          "chatId": "+Kp23rr6YLBgzZThi"
+          "chatId": "dreader_test"
         }',
         30);

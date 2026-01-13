@@ -11,6 +11,7 @@ import ru.dreader.dreadernews.entity.PublishResult;
 import ru.dreader.dreadernews.enums.Platform;
 import ru.dreader.dreadernews.publisher.Publisher;
 
+import java.time.Instant;
 import java.util.*;
 
 @Component
@@ -40,7 +41,11 @@ public class TelegramPublisher implements Publisher {
                     .build();
         }
 
-        return sendWithRetry(post, botToken, chatId);
+        PublishResult publishResult = sendWithRetry(post, botToken, chatId);
+        publishResult.setChannel(channel);
+        publishResult.setPost(post);
+
+        return publishResult;
     }
 
     private PublishResult sendWithRetry(Post post, String botToken, String chatId) {
@@ -98,6 +103,7 @@ public class TelegramPublisher implements Publisher {
         if (response.ok()) {
             return PublishResult.builder()
                     .success(true)
+                    .publishedAt(Instant.now())
                     .externalId(response.result() != null
                             ? String.valueOf(response.result().messageId())
                             : null)
@@ -122,6 +128,7 @@ public class TelegramPublisher implements Publisher {
         if (response.ok()) {
             return PublishResult.builder()
                     .success(true)
+                    .publishedAt(Instant.now())
                     .externalId(response.result() != null
                             ? String.valueOf(response.result().messageId())
                             : null)
@@ -158,6 +165,7 @@ public class TelegramPublisher implements Publisher {
             // sendMediaGroup возвращает массив сообщений; тут можно расширить DTO,
             // пока оставим null либо первое message_id при доработке.
             return PublishResult.builder()
+                    .publishedAt(Instant.now())
                     .success(true)
                     .externalId(null)
                     .build();
