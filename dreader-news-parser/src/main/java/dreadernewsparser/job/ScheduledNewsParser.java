@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -89,6 +91,12 @@ public class ScheduledNewsParser {
                     for (String url : urls) {
                         try {
                             ArticleDto article = parserService.parse(url, source);
+
+                            if (article.publicationDate().isAfter(Instant.now().minus(1L, ChronoUnit.HOURS))) {
+                                log.info("The article is too new, skipping:{}", article.title());
+                                continue;
+                            }
+
                             // Ключевой момент: producer может ждать
                             articlesQueue.put(new ArticleSourcePair(article, source));
                             log.info("Queued: {} from {}", article.title(), source.getName());
