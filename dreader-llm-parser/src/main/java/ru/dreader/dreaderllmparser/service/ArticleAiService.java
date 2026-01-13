@@ -8,4 +8,3 @@ import java.util.Locale;
 public interface ArticleAiService {
     ArticleAiAnalysis analyze(String title, String bodyPlainText, List<String> rawTags, Locale locale);
 }
-

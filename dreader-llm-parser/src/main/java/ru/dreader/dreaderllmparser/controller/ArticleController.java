@@ -37,8 +37,8 @@ public class ArticleController {
         boolean acquired = false;
 
         try {
-            // Пытаемся получить lock в течение 30 секунд
-            acquired = lock.tryLock(30, TimeUnit.SECONDS);
+            // Пытаемся получить lock в течение 60 секунд
+            acquired = lock.tryLock(60, TimeUnit.SECONDS);
 
             if (!acquired) {
                 lockAcquireFailures.increment();
