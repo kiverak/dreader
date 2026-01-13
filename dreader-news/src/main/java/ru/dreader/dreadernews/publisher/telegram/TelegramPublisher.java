@@ -11,10 +11,7 @@ import ru.dreader.dreadernews.entity.PublishResult;
 import ru.dreader.dreadernews.enums.Platform;
 import ru.dreader.dreadernews.publisher.Publisher;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -74,17 +71,17 @@ public class TelegramPublisher implements Publisher {
     }
 
     private PublishResult send(Post post, String botToken, String chatId) {
-        List<PostMedia> media = post.getMedia();
+        Set<PostMedia> media = post.getMedia();
 
         if (media == null || media.isEmpty()) {
             return sendText(post, botToken, chatId);
         }
 
         if (media.size() == 1) {
-            return sendSinglePhoto(post, media.get(0), botToken, chatId);
+            return sendSinglePhoto(post, media.stream().findFirst().get(), botToken, chatId);
         }
 
-        return sendMediaGroup(post, media, botToken, chatId);
+        return sendMediaGroup(post, media.stream().toList(), botToken, chatId);
     }
 
     private PublishResult sendText(Post post, String botToken, String chatId) {

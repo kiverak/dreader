@@ -43,7 +43,7 @@ public class Post extends BaseEntity {
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
-    private List<Tag> tags;
+    private Set<Tag> tags = new HashSet<>();
 
     @ManyToMany
     @JoinTable(
@@ -54,6 +54,6 @@ public class Post extends BaseEntity {
     private Set<Channel> channels = new HashSet<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostMedia> media = new ArrayList<>();
+    private Set<PostMedia> media = new HashSet<>();
 
 }

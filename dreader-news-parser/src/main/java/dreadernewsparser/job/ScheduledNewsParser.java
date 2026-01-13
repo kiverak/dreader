@@ -93,7 +93,7 @@ public class ScheduledNewsParser {
                             ArticleDto article = parserService.parse(url, source);
 
                             if (article.publicationDate().isAfter(Instant.now().minus(1L, ChronoUnit.HOURS))) {
-                                log.info("The article is too new, skipping:{}", article.title());
+                                log.info("The article is too new, skipping: {}, {}", article.sourceName(), article.title());
                                 continue;
                             }
 

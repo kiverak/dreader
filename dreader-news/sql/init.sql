@@ -143,11 +143,20 @@ CREATE TABLE publish_result
     published_at  TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_channel_platform ON channel(platform);
-CREATE INDEX IF NOT EXISTS idx_channel_name ON channel(name);
-CREATE INDEX IF NOT EXISTS idx_post_status ON post(status);
-CREATE INDEX IF NOT EXISTS idx_post_scheduled_at ON post(scheduled_at);
-CREATE INDEX IF NOT EXISTS idx_post_media_post_id ON post_media(post_id);
-CREATE INDEX IF NOT EXISTS idx_publish_result_post_id ON publish_result(post_id);
-CREATE INDEX IF NOT EXISTS idx_publish_result_channel_id ON publish_result(channel_id);
-CREATE INDEX IF NOT EXISTS idx_publish_result_success ON publish_result(success);
+CREATE INDEX IF NOT EXISTS idx_channel_platform ON channel (platform);
+CREATE INDEX IF NOT EXISTS idx_channel_name ON channel (name);
+CREATE INDEX IF NOT EXISTS idx_post_status ON post (status);
+CREATE INDEX IF NOT EXISTS idx_post_scheduled_at ON post (scheduled_at);
+CREATE INDEX IF NOT EXISTS idx_post_media_post_id ON post_media (post_id);
+CREATE INDEX IF NOT EXISTS idx_publish_result_post_id ON publish_result (post_id);
+CREATE INDEX IF NOT EXISTS idx_publish_result_channel_id ON publish_result (channel_id);
+CREATE INDEX IF NOT EXISTS idx_publish_result_success ON publish_result (success);
+
+INSERT INTO channel (platform, name, credentials, min_update_period_in_minutes)
+VALUES ('TELEGRAM',
+        'dreader-test',
+        '{
+          "botToken": "8585153270:AAFwZLCwmMDv7TMABrwd8Qn_2GOxSFovINQ",
+          "chatId": "+Kp23rr6YLBgzZThi"
+        }',
+        30);

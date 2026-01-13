@@ -5,16 +5,22 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dreader.dreadernews.dto.ArticleResponse;
+import ru.dreader.dreadernews.dto.ChannelDto;
 import ru.dreader.dreadernews.dto.ParseRequest;
 import ru.dreader.dreadernews.entity.Article;
+import ru.dreader.dreadernews.entity.Channel;
 import ru.dreader.dreadernews.entity.Post;
 import ru.dreader.dreadernews.entity.Tag;
 import ru.dreader.dreadernews.mapper.ArticlePostMapper;
 import ru.dreader.dreadernews.service.ArticleService;
+import ru.dreader.dreadernews.service.ChannelService;
 import ru.dreader.dreadernews.service.PostService;
 import ru.dreader.dreadernews.web.LLMParserClient;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -24,6 +30,7 @@ public class ArticlesLLMParsingProcessor {
     private final LLMParserClient llmParserClient;
     private final PostService postService;
     private final ArticleService articleService;
+    private final ChannelService channelService;
     private final ArticlePostMapper articlePostMapper;
 
     /**
@@ -47,6 +54,7 @@ public class ArticlesLLMParsingProcessor {
         log.info("Article {} LLM parsed: {}", article.getId(), response);
 
         Post post = articlePostMapper.map(article, response);
+        post.setChannels(channelService.getAllChannelsSet());   // TODO create strategy for channels
         postService.save(post);
         article.setLlmParsed(true);
         log.info("Fresh post saved id: {}", post.getId());

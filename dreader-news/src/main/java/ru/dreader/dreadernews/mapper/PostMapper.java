@@ -11,6 +11,7 @@ import ru.dreader.dreadernews.service.TagService;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 @Component
@@ -28,7 +29,7 @@ public class PostMapper {
         Post post = new Post();
         post.setText(postDto.text());
         post.setStatus(postDto.status());
-        post.setTags(tagService.getOrCreateByNames(postDto.tags()));
+        post.setTags(new HashSet<>(tagService.getOrCreateByNames(postDto.tags())));
 //        post.setMedia(postDto.mediaUrls());
 
         return post;

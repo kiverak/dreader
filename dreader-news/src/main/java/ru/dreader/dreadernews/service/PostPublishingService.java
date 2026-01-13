@@ -30,6 +30,7 @@ public class PostPublishingService {
 
     @Transactional
     public void publish(Post post) {
+        post.setChannels(Set.of(channelRepository.findAll().getFirst()));   // TODO remove after test
         Set<Long> targetChannelIds = post.getChannels().stream().map(Channel::getId).collect(Collectors.toSet());
         List<Channel> channels = channelRepository.findAllById(targetChannelIds);
 
