@@ -25,7 +25,7 @@ public class ProcessedArticleService {
 
     @Transactional(readOnly = true)
     public ProcessedArticleDto getById(Long id) {
-        ProcessedArticle article = processedArticleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Article not found: " + id));
+        ProcessedArticle article = processedArticleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Processed article not found: " + id));
         return processedArticleMapper.toDto(article);
     }
 
@@ -53,13 +53,6 @@ public class ProcessedArticleService {
                 .toList();
 
         return list.isEmpty() ? null : list.getFirst();
-    }
-
-    @Transactional(readOnly = true)
-    public List<ProcessedArticle> getEarliestForDayReadyToPostBunch(final int bunchSize) {
-        return processedArticleRepository.findEarliestFor24HoursNotParsed(PageRequest.of(0, bunchSize))
-                .stream()
-                .toList();
     }
 
     @Transactional

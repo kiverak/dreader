@@ -46,8 +46,6 @@ public class Article extends AuditEntity {
     )
     private List<Tag> tags;
 
-    private boolean llmParsed = false;
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

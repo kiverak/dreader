@@ -1,6 +1,5 @@
 package ru.dreader.dreadernews.job;
 
-import dto.ArticleDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -10,14 +9,11 @@ import ru.dreader.dreadernews.entity.Article;
 import ru.dreader.dreadernews.entity.Post;
 import ru.dreader.dreadernews.entity.ProcessedArticle;
 import ru.dreader.dreadernews.entity.Tag;
-import ru.dreader.dreadernews.mapper.ArticlePostMapper;
+import ru.dreader.dreadernews.mapper.ProcessedArticlePostMapper;
 import ru.dreader.dreadernews.mapper.ProcessedArticleMapper;
 import ru.dreader.dreadernews.repo.ArticleRepository;
 import ru.dreader.dreadernews.repo.ProcessedArticleRepository;
-import ru.dreader.dreadernews.service.ArticleService;
-import ru.dreader.dreadernews.service.CategoryService;
-import ru.dreader.dreadernews.service.ChannelService;
-import ru.dreader.dreadernews.service.PostService;
+import ru.dreader.dreadernews.service.*;
 import ru.dreader.dreadernews.web.LLMParserClient;
 
 import java.util.ArrayList;
@@ -33,10 +29,11 @@ public class LLMArticleProcessor {
     private final LLMParserClient llmParserClient;
     private final PostService postService;
     private final ArticleService articleService;
+    private final ProcessedArticleService processedArticleService;
     private final ArticleRepository articleRepository;
     private final ProcessedArticleRepository processedArticleRepository;
     private final ChannelService channelService;
-    private final ArticlePostMapper articlePostMapper;
+    private final ProcessedArticlePostMapper processedArticlePostMapper;
     private final CategoryService categoryService;
     private final ProcessedArticleMapper processedArticleMapper;
 
@@ -45,9 +42,9 @@ public class LLMArticleProcessor {
      */
     @Transactional
     protected boolean parseOneArticle() {
-        var article = articleService.getEarliestForDayReadyToPost();
+        var processedArticle = processedArticleService.getEarliestForDayReadyToPost();
 
-        if (article == null) {
+        if (processedArticle == null) {
             try {
                 Thread.sleep(5000); // нет работы — подождём 5 секунд
             } catch (InterruptedException ignored) {
@@ -55,21 +52,21 @@ public class LLMArticleProcessor {
             return false;
         }
 
-        log.info("Getting article {} for LLM parsing", article.getId());
-        ParseRequest request = createParseRequest(article);
+        log.info("Getting processedArticle {} for LLM parsing", processedArticle.getId());
+        ParseRequest request = createParseRequest(processedArticle);
         ArticleResponse response = llmParserClient.parseArticle(request);
-        log.info("Article {} LLM parsed: {}", article.getId(), response);
+        log.info("ProcessedArticle {} LLM parsed: {}", processedArticle.getId(), response);
 
-        Post post = articlePostMapper.map(article, response);
+        Post post = processedArticlePostMapper.map(processedArticle, response);
         post.setChannels(channelService.getAllChannelsSet());   // TODO create strategy for channels
         postService.save(post);
-        article.setLlmParsed(true);
+        processedArticle.setLlmParsed(true);
         log.info("Fresh post saved id: {}", post.getId());
 
         return true;
     }
 
-    private ParseRequest createParseRequest(Article article) {
+    private ParseRequest createParseRequest(ProcessedArticle article) {
         String url = article.getUrl();
         String title = article.getTitle();
         String body = article.getContent();

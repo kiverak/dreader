@@ -35,7 +35,7 @@ public class LLMArticleCategorizer {
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private volatile boolean running = true;
 
-    // любой стабильный ключ, например хэш имени воркера
+    // any stable key
     private static final long WORKER_LOCK_KEY = 321654987L;
 
     @PostConstruct
@@ -76,7 +76,7 @@ public class LLMArticleCategorizer {
                 tasksFailed.increment();
                 log.error("Unexpected error in LLM parsing worker", e);
                 try {
-                    Thread.sleep(2000); // небольшой backoff, чтобы не зациклиться на ошибке
+                    Thread.sleep(2000); // backoff
                 } catch (InterruptedException ignored) {
                 }
             }
@@ -85,7 +85,7 @@ public class LLMArticleCategorizer {
     }
 
     /**
-     * @return true если статьи обработаны, false если работы не было
+     * @return true if article was processed, false if no work was done
      */
     protected boolean processArticlesBunch() {
         Pair<CategorizingResponse, List<Article>> categorizingResponse = processor.categorizeArticleBunch();

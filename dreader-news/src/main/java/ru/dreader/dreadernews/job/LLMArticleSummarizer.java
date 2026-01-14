@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-public class LLMArticleParser {
+public class LLMArticleSummarizer {
 
     private final JdbcTemplate jdbcTemplate;
     private final LLMArticleProcessor processor;
@@ -29,17 +29,17 @@ public class LLMArticleParser {
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private volatile boolean running = true;
 
-    // любой стабильный ключ, например хэш имени воркера
+    // any stable key
     private static final long WORKER_LOCK_KEY = 123456789L;
 
     @PostConstruct
     public void startWorker() {
-//        if (!tryAcquireClusterLock()) {
-//            log.info("LLM worker: another instance already holds the cluster lock, worker will not start");
-//            return;
-//        }
-//
-//        worker.submit(this::workerLoop);
+        if (!tryAcquireClusterLock()) {
+            log.info("LLM worker: another instance already holds the cluster lock, worker will not start");
+            return;
+        }
+
+        worker.submit(this::workerLoop);
         log.info("Articles LLM Parsing Worker started");
     }
 
@@ -79,7 +79,7 @@ public class LLMArticleParser {
     }
 
     /**
-     * @return true если статья обработана, false если работы не было
+     * @return true if article was processed, false if no work was done
      */
     protected boolean processOneArticle() {
         return processor.parseOneArticle();

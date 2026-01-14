@@ -38,8 +38,8 @@ public class ProcessedArticle extends AuditEntity {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-            name = "rated_tag",
-            joinColumns = @JoinColumn(name = "article_id"),
+            name = "processed_article_tag",
+            joinColumns = @JoinColumn(name = "processed_article_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<Tag> tags;

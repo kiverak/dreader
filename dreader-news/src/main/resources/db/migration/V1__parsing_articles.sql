@@ -41,7 +41,6 @@ CREATE TABLE IF NOT EXISTS article
     image_url        VARCHAR(255),
     source_id        BIGINT REFERENCES source (id),
     publication_date TIMESTAMP,
-    llm_parsed       BOOLEAN      NOT NULL DEFAULT false,
     created_at       TIMESTAMP    NOT NULL DEFAULT now(),
     updated_at       TIMESTAMP,
     created_by       UUID,

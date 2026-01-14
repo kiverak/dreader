@@ -17,7 +17,6 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
             SELECT a FROM Article a
             LEFT JOIN FETCH a.tags
             WHERE a.publicationDate >= CURRENT_TIMESTAMP - 1 DAY
-                        AND a.llmParsed = false
             ORDER BY a.publicationDate ASC
             """)
     List<Article> findEarliestFor24HoursNotParsed(Pageable pageable);

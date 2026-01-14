@@ -3,8 +3,8 @@ package ru.dreader.dreadernews.mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.dreader.dreadernews.dto.ArticleResponse;
-import ru.dreader.dreadernews.entity.Article;
 import ru.dreader.dreadernews.entity.Post;
+import ru.dreader.dreadernews.entity.ProcessedArticle;
 import ru.dreader.dreadernews.entity.Tag;
 import ru.dreader.dreadernews.enums.PostStatus;
 import ru.dreader.dreadernews.service.TagService;
@@ -13,15 +13,14 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class ArticlePostMapper {
+public class ProcessedArticlePostMapper {
 
     private final TagService tagService;
 
-    public Post map(Article article, ArticleResponse response) {
+    public Post map(ProcessedArticle article, ArticleResponse response) {
         Post post = new Post();
 
         post.setText(buildText(article, response));
@@ -44,7 +43,7 @@ public class ArticlePostMapper {
     }
 
     // Construct text from title, summary and bullets
-    private String buildText(Article article, ArticleResponse response) {
+    private String buildText(ProcessedArticle article, ArticleResponse response) {
         StringBuilder textBuilder = new StringBuilder();
 
         // Title as bold link
