@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import ru.dreader.dreaderllmparser.dto.*;
 import ru.dreader.dreaderllmparser.utils.LLMJsonCleaner;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 
 @Log4j2
 @Service
@@ -22,44 +24,65 @@ public class CategorizingService {
         this.chatClient = builder.build();
     }
 
-    public CategorizingResponse rankArticles(CategorizingRequest request) {
+    public CategorizingResponse rankArticles(CategorizingRequest request, Locale locale) {
 
-        String prompt = buildPrompt(request.articles(), request.categories());
+        String prompt = buildPrompt(request.articles(), request.categories(), locale);
+
+        Instant now = Instant.now();
 
         String response = chatClient.prompt(prompt)
                 .call()
                 .content();
+        
+        Instant then = Instant.now();
+        
+        log.info("LLM call duration: {} s", (then.toEpochMilli() - now.toEpochMilli()) / 1000.0);
 
         return parseResponse(response);
     }
 
-    public String buildPrompt(List<CategorizingArticleRequest> articles, List<CategorizingCategoryRequest> categories) {
+    public String buildPrompt(List<CategorizingArticleRequest> articles, List<CategorizingCategoryRequest> categories, Locale locale) {
+        String language = (locale.getLanguage().equals("ru")) ? "Russian" : "English";
         StringBuilder sb = new StringBuilder();
 
         sb.append("""
-                You are an expert news classifier and deduplication engine.
-                For each article, do two tasks:
+                You are llama3.1:8b, an expert system for news classification and duplicate detection.
+                All article titles, tags and category names are in %s.
                 
-                1. Determine which categories it belongs to based on title and tags.
-                   IMPORTANT: categories have id and name. Use the name for classification,
-                   but return ONLY category ids.
+                Your tasks for EACH article:
                 
-                2. Detect duplicates: articles that describe the same topic or event.
+                1) Category classification:
+                   • Categories have "id" and "name".
+                   • Use ONLY the Russian "name" for semantic classification.
+                   • In the output return ONLY category ids in "matchedCategoryIds".
                 
-                Return STRICT JSON:
+                2) Duplicate detection:
+                   • Articles describing the same event or topic are duplicates.
+                   • Use semantic similarity, not exact text matching.
+                   • Return ids of duplicate articles in "duplicateIds".
+                   • If no duplicates exist, return an empty list.
+                
+                OUTPUT RULES (VERY IMPORTANT):
+                • Output MUST be STRICT JSON.
+                • NO explanations, NO comments, NO markdown, NO text before or after JSON.
+                • Output MUST be a JSON array of objects.
+                • Use ONLY integers for ids.
+                
+                Example of the required output format:
                 [
                   {
-                    "id": <articleId>,
-                    "matchedCategoryIds": [1, 2],
-                    "duplicateIds": [5, 7]
+                    "id": 1,
+                    "matchedCategoryIds": [2, 5],
+                    "duplicateIds": [7]
                   }
                 ]
                 
-                Categories (id → name):
-                """);
+                Categories (id — name):
+                """.formatted(language)
+        );
 
         for (CategorizingCategoryRequest c : categories) {
-            sb.append("- ").append(c.id()).append(": ").append(c.name()).append("\n");
+            sb.append(c.id()).append(" — ").append(c.name()).append("\n");
         }
 
         sb.append("\nArticles:\n");
@@ -69,8 +92,13 @@ public class CategorizingService {
             sb.append("Tags: ").append(String.join(", ", a.tags())).append("\n\n");
         }
 
+        sb.append("""
+                Return ONLY the JSON array. No additional text.
+                """);
+
         return sb.toString();
     }
+
 
     private CategorizingResponse parseResponse(String json) {
         try {
