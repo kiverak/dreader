@@ -10,6 +10,7 @@ import ru.dreader.dreadernews.entity.Tag;
 import ru.dreader.dreadernews.mapper.SourceMapper;
 import ru.dreader.dreadernews.repo.SourceRepository;
 import ru.dreader.dreadernews.web.ArticleParserClient;
+import ru.dreader.mvc.exception.ResourceNotFoundException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -132,5 +133,15 @@ public class SourceService {
     @Transactional(readOnly = true)
     public List<Source> findAllBySourceNames(List<String> sourceNames) {
         return sourceRepository.findAllBySourceNames(sourceNames);
+    }
+
+    @Transactional(readOnly = true)
+    public Source getByArticleId(Long id) {
+        return sourceRepository.findByArticleId(id).orElseThrow(() -> new ResourceNotFoundException("Source not found for article id: " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public Source getByProcessedArticleId(Long id) {
+        return sourceRepository.findByProcessedArticleId(id).orElseThrow(() -> new ResourceNotFoundException("Source not found for processed article id: " + id));
     }
 }

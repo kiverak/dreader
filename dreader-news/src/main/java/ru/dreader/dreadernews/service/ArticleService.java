@@ -52,11 +52,29 @@ public class ArticleService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public Article getEarliestForDayReadyToPost() {
         List<Article> list = articleRepository.findEarliestFor24HoursNotParsed(PageRequest.of(0, 1))
                 .stream()
                 .toList();
 
         return list.isEmpty() ? null : list.getFirst();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Article> getEarliestForDayReadyToPostBunch(final int bunchSize) {
+        return articleRepository.findEarliestFor24HoursNotParsed(PageRequest.of(0, bunchSize))
+                .stream()
+                .toList();
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        articleRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void delete(List<Long> iDs) {
+        articleRepository.deleteAllById(iDs);
     }
 }

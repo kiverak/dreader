@@ -53,4 +53,14 @@ public class TagService {
     public void deleteById(Long id) {
         tagRepository.deleteById(id);
     }
+
+    @Transactional(readOnly = true)
+    public List<Tag> getTagsByArticleId(Long articleId) {
+        return tagRepository.findByArticleId(articleId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Tag> getTagsByProcessedArticleId(Long id) {
+        return tagRepository.findByProcessedArticleId(id);
+    }
 }

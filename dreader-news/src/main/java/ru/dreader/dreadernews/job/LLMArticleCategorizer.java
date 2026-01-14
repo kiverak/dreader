@@ -8,7 +8,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import ru.dreader.dreadernews.dto.CategorizingResponse;
+import ru.dreader.dreadernews.dto.Pair;
+import ru.dreader.dreadernews.entity.Article;
+import ru.dreader.dreadernews.service.RatingCalculator;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -16,10 +21,11 @@ import java.util.concurrent.TimeUnit;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-public class ArticlesLLMParsingScheduler {
+public class LLMArticleCategorizer {
 
     private final JdbcTemplate jdbcTemplate;
-    private final ArticlesLLMParsingProcessor processor;
+    private final LLMArticleProcessor processor;
+    private final RatingCalculator ratingCalculator;
 
     // Prometheus metrics
     private final Counter tasksProcessed;
@@ -30,7 +36,7 @@ public class ArticlesLLMParsingScheduler {
     private volatile boolean running = true;
 
     // любой стабильный ключ, например хэш имени воркера
-    private static final long WORKER_LOCK_KEY = 123456789L;
+    private static final long WORKER_LOCK_KEY = 321654987L;
 
     @PostConstruct
     public void startWorker() {
@@ -40,7 +46,7 @@ public class ArticlesLLMParsingScheduler {
         }
 
         worker.submit(this::workerLoop);
-        log.info("Articles LLM Parsing Worker started");
+        log.info("Articles LLM Categorizing Worker started");
     }
 
     private boolean tryAcquireClusterLock() {
@@ -61,7 +67,7 @@ public class ArticlesLLMParsingScheduler {
         while (running) {
             try {
                 Timer.Sample sample = Timer.start();
-                boolean processed = processOneArticle();
+                boolean processed = processArticlesBunch();
                 if (processed) {
                     tasksProcessed.increment();
                 }
@@ -79,15 +85,23 @@ public class ArticlesLLMParsingScheduler {
     }
 
     /**
-     * @return true если статья обработана, false если работы не было
+     * @return true если статьи обработаны, false если работы не было
      */
-    protected boolean processOneArticle() {
-        return processor.processOneArticle();
+    protected boolean processArticlesBunch() {
+        Pair<CategorizingResponse, List<Article>> categorizingResponse = processor.categorizeArticleBunch();
+        if (categorizingResponse == null) return false;
+
+        List<Long> articlesToPublishIds = ratingCalculator.getHighRatedArticlesToPublish(categorizingResponse);
+
+        processor.deleteArticlesWithLowRatingAndDuplicates(categorizingResponse.second(), articlesToPublishIds);
+        processor.createProcessedArticlesToPublish(articlesToPublishIds);
+
+        return true;
     }
 
     @PreDestroy
     public void shutdown() {
-        log.info("Stopping Articles LLM Parsing Worker...");
+        log.info("Stopping Articles LLM Categorizing Worker...");
         running = false;
         worker.shutdown();
         try {
@@ -101,4 +115,5 @@ public class ArticlesLLMParsingScheduler {
             releaseClusterLock();
         }
     }
+
 }

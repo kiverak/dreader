@@ -5,8 +5,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import ru.dreader.dreadernews.dto.ArticleResponse;
+import ru.dreader.dreadernews.dto.CategorizingRequest;
+import ru.dreader.dreadernews.dto.CategorizingResponse;
 import ru.dreader.dreadernews.dto.ParseRequest;
-import ru.dreader.dreadernews.entity.Article;
 
 @Component
 public class LLMParserClient {
@@ -27,6 +28,19 @@ public class LLMParserClient {
                                 .flatMap(errorBody -> Mono.error(new RuntimeException("Error parsing article: " + errorBody)))
                 )
                 .bodyToMono(ArticleResponse.class)
+                .block();
+    }
+
+    public CategorizingResponse categorizeArticles(final CategorizingRequest request) {
+        return defaultWebClient.post()
+                .uri("/categorize")
+                .body(Mono.just(request), CategorizingRequest.class)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, response ->
+                        response.bodyToMono(String.class)
+                                .flatMap(errorBody -> Mono.error(new RuntimeException("Error categorize article: " + errorBody)))
+                )
+                .bodyToMono(CategorizingResponse.class)
                 .block();
     }
 }

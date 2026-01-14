@@ -6,8 +6,6 @@ CREATE TABLE IF NOT EXISTS tag
     name       VARCHAR(255) NOT NULL UNIQUE,
     created_at TIMESTAMP    NOT NULL DEFAULT now(),
     updated_at TIMESTAMP,
-    created_by UUID,
-    updated_by UUID,
     version    BIGINT       NOT NULL DEFAULT 1
 );
 

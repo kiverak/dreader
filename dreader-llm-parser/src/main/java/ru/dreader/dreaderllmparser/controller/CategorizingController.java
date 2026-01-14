@@ -12,12 +12,12 @@ import ru.dreader.dreaderllmparser.service.CategorizingService;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class RankingController {
+public class CategorizingController {
 
     private final CategorizingService categorizingService;
 
-    @PostMapping("/rank")
-    public CategorizingResponse rank(@RequestBody CategorizingRequest request) {
+    @PostMapping("/categorize")
+    public CategorizingResponse categorize(@RequestBody CategorizingRequest request) {
         return categorizingService.rankArticles(request);
     }
 }

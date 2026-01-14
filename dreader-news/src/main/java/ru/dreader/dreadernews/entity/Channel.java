@@ -7,6 +7,7 @@ import org.hibernate.annotations.Type;
 import ru.dreader.dreadernews.enums.Platform;
 import ru.dreader.mvc.entity.AuditEntity;
 
+import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -37,4 +38,12 @@ public class Channel extends AuditEntity {
 
     @Column(nullable = false)
     private int minUpdatePeriodInMinutes = 30;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "category_tag",
+            joinColumns = @JoinColumn(name = "article_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Category> category;
 }
