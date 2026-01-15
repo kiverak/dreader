@@ -7,7 +7,7 @@ import java.util.List;
 public record PostDto(
         String text,
         PostStatus status,
-        List<String> tags,
-        List<String> mediaUrls
+        List<String> mediaUrls,
+        List<Long> categoryIds
         ) {
 }

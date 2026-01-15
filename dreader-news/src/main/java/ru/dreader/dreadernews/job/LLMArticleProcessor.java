@@ -5,10 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dreader.dreadernews.dto.*;
-import ru.dreader.dreadernews.entity.Article;
-import ru.dreader.dreadernews.entity.Post;
-import ru.dreader.dreadernews.entity.ProcessedArticle;
-import ru.dreader.dreadernews.entity.Tag;
+import ru.dreader.dreadernews.entity.*;
 import ru.dreader.dreadernews.mapper.ProcessedArticlePostMapper;
 import ru.dreader.dreadernews.mapper.ProcessedArticleMapper;
 import ru.dreader.dreadernews.repo.ArticleRepository;
@@ -18,6 +15,9 @@ import ru.dreader.dreadernews.web.LLMParserClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -32,7 +32,6 @@ public class LLMArticleProcessor {
     private final ProcessedArticleService processedArticleService;
     private final ArticleRepository articleRepository;
     private final ProcessedArticleRepository processedArticleRepository;
-    private final ChannelService channelService;
     private final ProcessedArticlePostMapper processedArticlePostMapper;
     private final CategoryService categoryService;
     private final ProcessedArticleMapper processedArticleMapper;
@@ -58,7 +57,6 @@ public class LLMArticleProcessor {
         log.info("ProcessedArticle {} LLM parsed: {}", processedArticle.getId(), response);
 
         Post post = processedArticlePostMapper.map(processedArticle, response);
-        post.setChannels(channelService.getAllChannelsSet());   // TODO create strategy for channels
         postService.save(post);
         processedArticle.setLlmParsed(true);
         log.info("Fresh post saved id: {}", post.getId());
@@ -128,15 +126,30 @@ public class LLMArticleProcessor {
     }
 
     @Transactional
-    public void createProcessedArticlesToPublish(List<Long> articlesToPublishIds) {
+    public void createProcessedArticlesToPublish(List<Long> articlesToPublishIds, List<CategorizingArticleResult> results) {
         List<ProcessedArticle> processedArticles = new ArrayList<>();
         for (Long id : articlesToPublishIds) {
             Article article = articleRepository.findById(id).get();
+
+            CategorizingArticleResult res = results.stream()
+                    .filter(r -> r.id().equals(id))
+                    .findFirst()
+                    .orElseThrow(() -> new LLMException("LLM exception"));
+            List<Category> categoriesByIds = categoryService.getCategoriesByIds(res.matchedCategoryIds());
+
             ProcessedArticle processedArticle = processedArticleMapper.map(article);
+            processedArticle.setCategories(categoriesByIds);
+
             processedArticles.add(processedArticle);
         }
 
         processedArticleRepository.saveAll(processedArticles);
         articleService.delete(articlesToPublishIds);
+    }
+
+    static class LLMException extends RuntimeException {
+        public LLMException(String message) {
+            super(message);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package ru.dreader.dreadernews.repo;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,19 +12,26 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("""
-            SELECT DISTINCT p FROM Post p
-            LEFT JOIN FETCH p.tags
-            LEFT JOIN FETCH p.channels
-            LEFT JOIN FETCH p.media
-            WHERE p.status = 'PENDING'
-              AND (p.scheduledAt IS NULL OR p.scheduledAt <= CURRENT_TIMESTAMP)
-              AND NOT EXISTS (
-                  SELECT pr FROM PublishResult pr
-                  WHERE pr.post = p
-                    AND pr.success = true
-                    AND pr.channel IN ELEMENTS(p.channels)
-              )
-            ORDER BY p.scheduledAt ASC
+            SELECT p FROM Post p
+            JOIN p.categories c
+            WHERE c.id = :categoryId
+              AND (p.status = 'PUBLISHED' OR p.status = 'PARTIAL')
             """)
-    List<Post> findReadyToPublish();
+    List<Post> findLatestPublishedByCategory(Long categoryId, Pageable pageable);
+
+    @Query("""
+            SELECT p FROM Post p
+            JOIN p.categories c
+            WHERE c.id = :categoryId
+              AND p.status = 'PENDING'
+              AND p.rate = (
+                  SELECT MAX(p2.rate)
+                  FROM Post p2
+                  JOIN p2.categories c2
+                  WHERE c2.id = :categoryId
+                    AND p2.status = 'PENDING'
+              )
+            """)
+    List<Post> findUnpublishedWithMaxRateByCategoryId(Long categoryId);
+
 }

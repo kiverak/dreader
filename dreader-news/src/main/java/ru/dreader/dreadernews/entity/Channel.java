@@ -36,14 +36,11 @@ public class Channel extends AuditEntity {
     @Column(columnDefinition = "jsonb", nullable = false)
     private Map<String, String> credentials;
 
-    @Column(nullable = false)
-    private int minUpdatePeriodInMinutes = 30;
-
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "channel_category",
             joinColumns = @JoinColumn(name = "channel_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private List<Category> category;
+    private List<Category> categories;
 }

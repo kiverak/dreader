@@ -6,7 +6,6 @@ import ru.dreader.dreadernews.enums.PostStatus;
 import ru.dreader.mvc.entity.BaseEntity;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -37,22 +36,6 @@ public class Post extends BaseEntity {
     @Column(nullable = false, length = 32)
     private PostStatus status = PostStatus.PENDING;
 
-    @ManyToMany
-    @JoinTable(
-            name = "post_tag",
-            joinColumns = @JoinColumn(name = "post_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private Set<Tag> tags = new HashSet<>();
-
-    @ManyToMany
-    @JoinTable(
-            name = "post_channel",
-            joinColumns = @JoinColumn(name = "post_id"),
-            inverseJoinColumns = @JoinColumn(name = "channel_id")
-    )
-    private Set<Channel> channels = new HashSet<>();
-
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostMedia> media = new HashSet<>();
 
@@ -62,5 +45,7 @@ public class Post extends BaseEntity {
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private List<Category> category;
+    private List<Category> categories = new ArrayList<>();
+
+    private int rate = 0;
 }

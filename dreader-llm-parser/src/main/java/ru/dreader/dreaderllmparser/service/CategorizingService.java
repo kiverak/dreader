@@ -25,7 +25,7 @@ public class CategorizingService {
     }
 
     public CategorizingResponse rankArticles(CategorizingRequest request, Locale locale) {
-
+        log.info("LLM call started");
         String prompt = buildPrompt(request.articles(), request.categories(), locale);
 
         Instant now = Instant.now();

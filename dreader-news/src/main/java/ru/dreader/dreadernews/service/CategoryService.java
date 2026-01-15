@@ -32,6 +32,11 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
+    public List<Category> getCategoriesByIds(List<Long> iDs) {
+        return categoryRepository.findAllById(iDs);
+    }
+
+    @Transactional(readOnly = true)
     public CategoryDto getByName(String name) {
         Category category = categoryRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with name: " + name));

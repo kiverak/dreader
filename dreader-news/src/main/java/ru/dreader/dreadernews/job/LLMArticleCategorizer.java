@@ -94,7 +94,7 @@ public class LLMArticleCategorizer {
         List<Long> articlesToPublishIds = ratingCalculator.getHighRatedArticlesToPublish(categorizingResponse);
 
         processor.deleteArticlesWithLowRatingAndDuplicates(categorizingResponse.second(), articlesToPublishIds);
-        processor.createProcessedArticlesToPublish(articlesToPublishIds);
+        processor.createProcessedArticlesToPublish(articlesToPublishIds, categorizingResponse.first().results());
 
         return true;
     }

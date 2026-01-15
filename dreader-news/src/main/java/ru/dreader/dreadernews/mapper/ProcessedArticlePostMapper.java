@@ -3,22 +3,20 @@ package ru.dreader.dreadernews.mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.dreader.dreadernews.dto.ArticleResponse;
+import ru.dreader.dreadernews.entity.Category;
 import ru.dreader.dreadernews.entity.Post;
 import ru.dreader.dreadernews.entity.ProcessedArticle;
-import ru.dreader.dreadernews.entity.Tag;
 import ru.dreader.dreadernews.enums.PostStatus;
-import ru.dreader.dreadernews.service.TagService;
+import ru.dreader.dreadernews.repo.CategoryRepository;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class ProcessedArticlePostMapper {
 
-    private final TagService tagService;
+    private final CategoryRepository categoryRepository;
 
     public Post map(ProcessedArticle article, ArticleResponse response) {
         Post post = new Post();
@@ -27,17 +25,10 @@ public class ProcessedArticlePostMapper {
         post.setStatus(PostStatus.PENDING);
         post.setScheduledAt(Instant.now()); // TODO logic for scheduling
 
-        // Map tags
-        List<String> tagNames = new ArrayList<>();
-        if (response.mainCategory() != null) {
-            tagNames.add(response.mainCategory());
-        }
-        if (response.secondaryCategories() != null) {
-            tagNames.addAll(response.secondaryCategories());
-        }
+        Optional<Category> category = categoryRepository.findByName(response.mainCategory()); // TODO
+        category.ifPresent(value -> post.getCategories().add(value));
 
-        List<Tag> tags = tagService.getOrCreateByNames(tagNames);
-        post.setTags(new HashSet<>(tags));
+        post.setRate(article.getRate());
 
         return post;
     }

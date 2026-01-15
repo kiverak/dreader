@@ -7,6 +7,7 @@ import ru.dreader.mvc.entity.AuditEntity;
 import ru.dreader.mvc.entity.BaseEntity;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,6 +46,14 @@ public class ProcessedArticle extends AuditEntity {
     private List<Tag> tags;
 
     private boolean llmParsed = false;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "processed_article_category",
+            joinColumns = @JoinColumn(name = "processed_article_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private List<Category> categories = new ArrayList<>();
 
     private int rate = 0;
 

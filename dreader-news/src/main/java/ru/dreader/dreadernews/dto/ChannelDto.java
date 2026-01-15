@@ -3,6 +3,7 @@ package ru.dreader.dreadernews.dto;
 import lombok.Data;
 import ru.dreader.dreadernews.enums.Platform;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -11,5 +12,5 @@ public class ChannelDto {
     private Platform platform;
     private String name;
     private Map<String, String> credentials;
-    private int minUpdatePeriodInMinutes;
+    private List<Long> categoryIds;
 }

@@ -1,15 +1,18 @@
 package ru.dreader.dreaderllmparser.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 import ru.dreader.dreaderllmparser.dto.ArticleAiAnalysis;
 import ru.dreader.dreaderllmparser.utils.LLMJsonCleaner;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+@Log4j2
 @Service
 public class ArticleAiServiceImpl implements ArticleAiService {
 
@@ -21,11 +24,18 @@ public class ArticleAiServiceImpl implements ArticleAiService {
 
     @Override
     public ArticleAiAnalysis analyze(String title, String bodyPlainText, List<String> rawTags, Locale locale) {
+        log.info("LLM call started");
         String prompt = buildPrompt(title, bodyPlainText, rawTags, locale);
+
+        Instant now = Instant.now();
 
         String response = chatClient.prompt(prompt)
                 .call()
                 .content();
+
+        Instant then = Instant.now();
+
+        log.info("LLM call duration: {} s", (then.toEpochMilli() - now.toEpochMilli()) / 1000.0);
 
         return parseResponse(response);
     }
@@ -43,7 +53,7 @@ public class ArticleAiServiceImpl implements ArticleAiService {
                 Задача:
                 1) Игнорируй рекламные вставки, ссылки на подписку, баннеры, промо и несодержательные вставки.
                 2) Сделай краткий пересказ статьи (summary, 1 предложение).
-                3) Сформулируй 5–10 тезисов (короткие пункты, bullet points).
+                3) Сформулируй 5–15 тезисов (короткие пункты, bullet points).
                 4) Определи одну главную категорию статьи из перечня: "технологии", "экономика", "политика", "наука", "культура", "спорт".
                 5) Опционально добавь до 3 дополнительных категорий (например: "ИИ", "космос", "США", "Европа", "Россия", "стартапы", "бизнес", "финансы").
                 6) Не придумывай факты, которых нет в тексте.
