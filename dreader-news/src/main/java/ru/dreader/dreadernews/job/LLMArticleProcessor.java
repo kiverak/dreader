@@ -6,18 +6,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dreader.dreadernews.dto.*;
 import ru.dreader.dreadernews.entity.*;
-import ru.dreader.dreadernews.mapper.ProcessedArticlePostMapper;
 import ru.dreader.dreadernews.mapper.ProcessedArticleMapper;
+import ru.dreader.dreadernews.mapper.ProcessedArticlePostMapper;
 import ru.dreader.dreadernews.repo.ArticleRepository;
 import ru.dreader.dreadernews.repo.ProcessedArticleRepository;
-import ru.dreader.dreadernews.service.*;
+import ru.dreader.dreadernews.service.ArticleService;
+import ru.dreader.dreadernews.service.CategoryService;
+import ru.dreader.dreadernews.service.PostService;
+import ru.dreader.dreadernews.service.ProcessedArticleService;
 import ru.dreader.dreadernews.web.LLMParserClient;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Log4j2
 @Service

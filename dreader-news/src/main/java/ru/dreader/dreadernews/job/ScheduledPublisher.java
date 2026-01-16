@@ -16,7 +16,7 @@ public class ScheduledPublisher {
     private final PublishingService publishingService;
     private final CategoryService categoryService;
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelay = 60000)
     public void processScheduledPosts() {
         // find categories
         List<CategoryDto> categories = categoryService.getAll();

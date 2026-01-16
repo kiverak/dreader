@@ -34,4 +34,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             """)
     List<Post> findUnpublishedWithMaxRateByCategoryId(Long categoryId);
 
+    @Query("""
+            SELECT p FROM Post p
+            JOIN p.categories c
+            WHERE c.id = :categoryId
+              AND p.status = 'PENDING'
+            """)
+    List<Post> findUnpublishedByCategoryId(Long categoryId);
 }
