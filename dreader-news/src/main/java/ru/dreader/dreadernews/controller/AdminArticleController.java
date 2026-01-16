@@ -7,12 +7,10 @@ import ru.dreader.dreadernews.service.ArticleService;
 
 import java.util.List;
 
-// for testing
-// TODO переделать на PostController
 @RestController
-@RequestMapping("/api/public/articles")
+@RequestMapping("/api/admin/articles")
 @RequiredArgsConstructor
-public class ArticleController {
+public class AdminArticleController {
 
     private final ArticleService articleService;
 

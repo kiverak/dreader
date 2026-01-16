@@ -37,8 +37,8 @@ public class PublishingService {
         int maxUpdatePeriodInMinutes = 60;
 
         // определяем дату последнего поста
-        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("createdAt").descending());
-        Post latestPublishedPost = postRepository.findLatestPublishedByCategory(category.id(), pageRequest).stream().findFirst().orElse(null);
+        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("updatedAt").descending());
+        Post latestPublishedPost = postRepository.findPublishedByCategoryId(category.id(), pageRequest).stream().findFirst().orElse(null);
 
         // if too early to publish then skip
         long diffMinutes = -1;

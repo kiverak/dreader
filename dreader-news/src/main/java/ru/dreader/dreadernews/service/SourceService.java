@@ -33,16 +33,16 @@ public class SourceService {
     }
 
     @Transactional(readOnly = true)
+    public Source getBySourceById(Long id) {
+        return sourceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Source not found with id: " + id));
+    }
+
+    @Transactional(readOnly = true)
     public List<SourceDetails> getAll() {
         return sourceRepository.findAll().stream()
                 .map(sourceMapper::toDto)
                 .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public void saveAll(List<SourceDetails> sourceDetails) {
-        List<Source> sources = sourceMapper.toEntity(sourceDetails);
-        sourceRepository.saveAll(sources);
     }
 
     @Transactional

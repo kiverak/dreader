@@ -30,7 +30,7 @@ public class ProcessedArticleService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProcessedArticleDto> getLast(Long tagId, Integer size, Integer page, String sort, String order) {
+    public List<ProcessedArticleDto> getProcessedArticles(Long tagId, Integer size, Integer page, String sort, String order) {
         Sort sortBy = Sort.by(Sort.Direction.fromString(order != null ? order : "DESC"), sort);
         Pageable pageable = PageRequest.of(page, size, sortBy);
 
@@ -56,7 +56,28 @@ public class ProcessedArticleService {
     }
 
     @Transactional
+    public ProcessedArticleDto create(ProcessedArticleDto processedArticleDto) {
+        ProcessedArticle pa = processedArticleMapper.toEntity(processedArticleDto);
+        pa = processedArticleRepository.save(pa);
+        return processedArticleMapper.toDto(pa);
+    }
+
+    @Transactional
+    public ProcessedArticleDto update(Long id, ProcessedArticleDto processedArticleDto) {
+        ProcessedArticle pa = processedArticleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Processed article not found by id: {}" + id));
+
+        processedArticleMapper.updateEntity(pa, processedArticleDto);
+        pa = processedArticleRepository.save(pa);
+
+        return processedArticleMapper.toDto(pa);
+    }
+
+    @Transactional
     public void delete(Long id) {
+        if (!processedArticleRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Processed article not found with id: " + id);
+        }
         processedArticleRepository.deleteById(id);
     }
 

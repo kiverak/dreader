@@ -18,10 +18,8 @@ public class ScheduledPublisher {
 
     @Scheduled(fixedDelay = 60000)
     public void processScheduledPosts() {
-        // find categories
         List<CategoryDto> categories = categoryService.getAll();
 
-        // для каждой категории запускаем паблишер:
         for (CategoryDto category : categories) {
             publishingService.publishPost(category);
         }

@@ -10,7 +10,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/source")
 @RequiredArgsConstructor
-public class SourceController {
+public class AdminSourceController {
 
     private final SourceService sourceService;
 

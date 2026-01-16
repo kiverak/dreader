@@ -58,10 +58,11 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDto update(Long id, String name) {
+    public CategoryDto update(Long id, CategoryDto dto) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
-        category.setName(name);
+        category.setName(dto.name());
+        category.setLang(Language.fromCode(dto.lang().toLowerCase()));
         category = categoryRepository.save(category);
         return new CategoryDto(category.getId(), category.getName(), category.getLang().getCode());
     }

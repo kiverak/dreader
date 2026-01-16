@@ -61,6 +61,9 @@ public class ArticleService {
 
     @Transactional
     public void delete(Long id) {
+        if (!articleRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Article not found with id: " + id);
+        }
         articleRepository.deleteById(id);
     }
 

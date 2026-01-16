@@ -10,7 +10,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/channel")
 @RequiredArgsConstructor
-public class ChannelController {
+public class AdminChannelController {
 
     private final ChannelService channelService;
 

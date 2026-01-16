@@ -1,10 +1,11 @@
 package ru.dreader.dreadernews.service;
 
-import ru.dreader.dreadernews.entity.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.dreader.dreadernews.entity.Tag;
 import ru.dreader.dreadernews.repo.TagRepository;
+import ru.dreader.mvc.exception.ResourceNotFoundException;
 
 import java.util.List;
 import java.util.Set;
@@ -51,7 +52,15 @@ public class TagService {
 
     @Transactional
     public void deleteById(Long id) {
+        if (!tagRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Tag not found with id: " + id);
+        }
         tagRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteByIds(List<Long> ids) {
+        tagRepository.deleteAllById(ids);
     }
 
     @Transactional(readOnly = true)

@@ -58,7 +58,8 @@ public class PostMapper {
                 post.getText(),
                 post.getStatus(),
                 mediaUrls,
-                categoryIds
+                categoryIds,
+                post.getUpdatedAt()
         );
     }
 }

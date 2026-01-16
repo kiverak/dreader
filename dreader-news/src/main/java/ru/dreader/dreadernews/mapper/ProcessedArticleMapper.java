@@ -51,6 +51,40 @@ public class ProcessedArticleMapper {
         return processedArticle;
     }
 
+    public ProcessedArticle toEntity(ProcessedArticleDto dto) {
+        ProcessedArticle entity = new ProcessedArticle();
+        fillOutEntity(entity, dto);
+
+        return entity;
+    }
+
+    public void updateEntity(ProcessedArticle entity, ProcessedArticleDto dto) {
+        fillOutEntity(entity, dto);
+    }
+
+    private void fillOutEntity(ProcessedArticle entity, ProcessedArticleDto dto) {
+        entity.setTitle(dto.title());
+        entity.setContent(dto.content());
+        entity.setShortContent(dto.shortContent());
+        entity.setUrl(dto.url());
+        entity.setImageUrl(dto.imageUrl());
+        entity.setPublicationDate(dto.publicationDate());
+        entity.setLlmParsed(dto.llmParsed());
+        entity.setRate(dto.rate());
+
+        if (dto.tags() != null && !dto.tags().isEmpty()) {
+            entity.setTags(tagService.getOrCreateByNames(dto.tags()));
+        } else {
+            entity.setTags(null);
+        }
+
+        if (dto.sourceId() != null) {
+            entity.setSource(sourceService.getBySourceById(dto.sourceId()));
+        } else {
+            entity.setSource(null);
+        }
+    }
+
     public ProcessedArticleDto toDto(ProcessedArticle processedArticle) {
         List<Tag> tags;
         try {
@@ -75,8 +109,8 @@ public class ProcessedArticleMapper {
                 processedArticle.getShortContent(),
                 processedArticle.getUrl(),
                 processedArticle.getImageUrl(),
-                source.getId(),
-                source.getName(),
+                source != null ? source.getId() : null,
+                source != null ? source.getName() : null,
                 processedArticle.getPublicationDate(),
                 tags.stream().map(Tag::getName).toList(),
                 processedArticle.isLlmParsed(),
