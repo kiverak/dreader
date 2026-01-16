@@ -13,6 +13,7 @@ import ru.dreader.dreadernews.mapper.ProcessedArticleMapper;
 import ru.dreader.dreadernews.repo.ProcessedArticleRepository;
 import ru.dreader.mvc.exception.ResourceNotFoundException;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,6 +54,11 @@ public class ProcessedArticleService {
                 .toList();
 
         return list.isEmpty() ? null : list.getFirst();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> getOldProcessedArticleIds(Instant now) {
+        return processedArticleRepository.findOldProcessedArticleIds(now);
     }
 
     @Transactional

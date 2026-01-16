@@ -13,6 +13,7 @@ import ru.dreader.dreadernews.entity.Post;
 import ru.dreader.dreadernews.mapper.PostMapper;
 import ru.dreader.dreadernews.repo.PostRepository;
 
+import java.time.Instant;
 import java.util.List;
 
 @Log4j2
@@ -47,6 +48,11 @@ public class PostService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<Long> getOldUnpublishedIds(Instant now) {
+        return postRepository.findOldUnpublishedIds(now);
+    }
+
     @Transactional
     public void save(Post post) {
         postRepository.save(post);
@@ -57,5 +63,10 @@ public class PostService {
             throw new IllegalArgumentException("Post not found with id: " + id);
         }
         postRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void delete(List<Long> ids) {
+        postRepository.deleteAllById(ids);
     }
 }

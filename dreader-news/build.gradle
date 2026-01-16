@@ -46,6 +46,8 @@ dependencies {
     implementation 'com.vladmihalcea:hibernate-types-60:2.21.1'
     implementation "org.flywaydb:flyway-core:11.20.1"
     implementation "org.flywaydb:flyway-database-postgresql:11.20.1"
+    implementation("net.javacrumbs.shedlock:shedlock-spring:7.5.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.5.0")
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.dreader.dreadernews.entity.Post;
 
+import java.time.Instant;
 import java.util.List;
 
 @Repository
@@ -44,4 +45,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
               AND p.status = 'PENDING'
             """)
     List<Post> findUnpublishedByCategoryId(Long categoryId);
+
+    @Query("""
+            SELECT p.id FROM Post p
+            WHERE p.status = 'PENDING'
+              AND p.createdAt < :now - 1 DAY
+            """)
+    List<Long> findOldUnpublishedIds(Instant now);
 }
