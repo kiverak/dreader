@@ -9,6 +9,7 @@ import ru.dreader.dreadernews.entity.Post;
 import ru.dreader.dreadernews.entity.PostMedia;
 import ru.dreader.dreadernews.entity.PublishResult;
 import ru.dreader.dreadernews.enums.Platform;
+import ru.dreader.dreadernews.publisher.ChannelRateLimiter;
 import ru.dreader.dreadernews.publisher.Publisher;
 
 import java.time.Instant;
@@ -22,7 +23,7 @@ public class TelegramPublisher implements Publisher {
     private static final int MAX_ATTEMPTS = 3;
 
     private final WebClient telegramClient;
-    private final TelegramRateLimiter rateLimiter;
+    private final ChannelRateLimiter rateLimiter;
 
     @Override
     public Platform getPlatform() {
@@ -218,11 +219,11 @@ public class TelegramPublisher implements Publisher {
     }
 
     private int backoffSeconds(int attempt) {
-        // простой экспоненциальный backoff: 1, 2, 4
+        // flat exponential backoff: 1, 2, 4
         return (int) Math.pow(2, attempt - 1);
     }
 
-    // Специальные исключения под разный тип ошибок
+    // --- Custom exceptions ---
 
     private static class TelegramRateLimitedException extends RuntimeException {
         private final int retryAfterSeconds;

@@ -1,12 +1,11 @@
-package ru.dreader.dreadernews.publisher.telegram;
+package ru.dreader.dreadernews.publisher;
 
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class TelegramRateLimiter {
+public class ChannelRateLimiter {
 
     // Telegram рекомендует: до 30 запросов/сек на бота и до 1/сек на чат
     private static final int GLOBAL_TOKENS_PER_SECOND = 30;

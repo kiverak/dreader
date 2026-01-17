@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dreader.dreadernews.dto.CategoryDto;
@@ -30,6 +31,7 @@ public class PublishingService {
     private final PublishResultService publishResultService;
     private final PostRepository postRepository;
 
+    @Async
     @Transactional
     public void publishPost(CategoryDto category) {
         // находим стратегию для категории // TODO
