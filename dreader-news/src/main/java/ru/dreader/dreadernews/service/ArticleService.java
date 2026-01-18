@@ -68,7 +68,7 @@ public class ArticleService {
     }
 
     @Transactional
-    public void delete(List<Long> iDs) {
-        articleRepository.deleteAllById(iDs);
+    public void delete(List<Long> ids) {
+        articleRepository.deleteAllById(ids);
     }
 }

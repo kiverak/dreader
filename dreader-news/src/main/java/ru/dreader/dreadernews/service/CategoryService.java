@@ -1,6 +1,8 @@
 package ru.dreader.dreadernews.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dreader.dreadernews.dto.CategoryDto;
@@ -18,6 +20,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "categories", key = "#root.method.name")
     public List<CategoryDto> getAll() {
         return categoryRepository.findAll().stream()
                 .map(category -> new CategoryDto(category.getId(), category.getName(), category.getLang().getCode()))
@@ -25,6 +28,7 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "categories", key = "#id")
     public CategoryDto getById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
@@ -32,8 +36,9 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public List<Category> getCategoriesByIds(List<Long> iDs) {
-        return categoryRepository.findAllById(iDs);
+    @Cacheable(value = "categories", key = "#ids")
+    public List<Category> getCategoriesByIds(List<Long> ids) {
+        return categoryRepository.findAllById(ids);
     }
 
     @Transactional(readOnly = true)
@@ -58,6 +63,7 @@ public class CategoryService {
     }
 
     @Transactional
+    @CacheEvict(value = "categories", key = "#id")
     public CategoryDto update(Long id, CategoryDto dto) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
@@ -68,6 +74,7 @@ public class CategoryService {
     }
 
     @Transactional
+    @CacheEvict(value = "categories", key = "#id")
     public void delete(Long id) {
         if (!categoryRepository.existsById(id)) {
             throw new ResourceNotFoundException("Category not found with id: " + id);

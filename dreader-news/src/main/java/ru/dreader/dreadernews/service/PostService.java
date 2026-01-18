@@ -2,6 +2,8 @@ package ru.dreader.dreadernews.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
 
+    @Cacheable(value = "posts", key = "#id")
     @Transactional(readOnly = true)
     public PostDto getById(Long id) {
         Post post = postRepository.findById(id)
@@ -31,6 +34,10 @@ public class PostService {
         return postMapper.toDto(post);
     }
 
+    @Cacheable(
+            value = "publishedPosts",
+            key = "T(java.util.Objects).hash(#categoryId, #size, #page, #sort, #order)"
+    )
     @Transactional(readOnly = true)
     public List<PostDto> getPublished(Long categoryId, Integer size, Integer page, String sort, String order) {
         Sort sortBy = Sort.by(Sort.Direction.fromString(order != null ? order : "DESC"), sort);
@@ -58,6 +65,8 @@ public class PostService {
         postRepository.save(post);
     }
 
+    @CacheEvict(value = "posts", key = "#id")
+    @Transactional
     public void delete(Long id) {
         if (!postRepository.existsById(id)) {
             throw new IllegalArgumentException("Post not found with id: " + id);
@@ -65,6 +74,7 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
+    @CacheEvict(value = "posts", allEntries = true)
     @Transactional
     public void delete(List<Long> ids) {
         postRepository.deleteAllById(ids);

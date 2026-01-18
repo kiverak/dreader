@@ -27,11 +27,6 @@ public class ChannelService {
     }
 
     @Transactional(readOnly = true)
-    public Set<Channel> getAllChannelsSet() {
-        return new HashSet<>(channelRepository.findAll());
-    }
-
-    @Transactional(readOnly = true)
     public ChannelDto getById(Long id) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Channel not found with id: " + id));

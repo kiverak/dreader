@@ -2,6 +2,7 @@ package ru.dreader.dreadernews.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
@@ -32,6 +33,7 @@ public class PublishingService {
     private final PostRepository postRepository;
 
     @Async
+    @CacheEvict(value = "publishedPosts", allEntries = true)
     @Transactional
     public void publishPost(CategoryDto category) {
         // находим стратегию для категории // TODO

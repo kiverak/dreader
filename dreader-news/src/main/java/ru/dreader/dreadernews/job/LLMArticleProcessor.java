@@ -115,14 +115,14 @@ public class LLMArticleProcessor {
     }
 
     public void deleteArticlesWithLowRatingAndDuplicates(List<Article> articles, List<Long> articlesToPublishIds) {
-        List<Long> iDsToDelete = new ArrayList<>();
+        List<Long> idsToDelete = new ArrayList<>();
         for (Article article : articles) {
             if (!articlesToPublishIds.contains(article.getId())) {
-                iDsToDelete.add(article.getId());
+                idsToDelete.add(article.getId());
             }
         }
 
-        articleService.delete(iDsToDelete);
+        articleService.delete(idsToDelete);
     }
 
     @Transactional

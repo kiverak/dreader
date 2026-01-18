@@ -1,10 +1,12 @@
 package ru.dreader.dreadernews.service;
 
+import dto.SourceDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import dto.SourceDetails;
 import ru.dreader.dreadernews.entity.Source;
 import ru.dreader.dreadernews.entity.Tag;
 import ru.dreader.dreadernews.mapper.SourceMapper;
@@ -26,6 +28,7 @@ public class SourceService {
     private final ArticleParserClient articleParserClient;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "sourceDetails", key = "#id")
     public SourceDetails getById(Long id) {
         Source source = sourceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Source not found with id: " + id));
@@ -33,12 +36,14 @@ public class SourceService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "source", key = "#id")
     public Source getBySourceById(Long id) {
         return sourceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Source not found with id: " + id));
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "sourceDetails", key = "#root.method.name")
     public List<SourceDetails> getAll() {
         return sourceRepository.findAll().stream()
                 .map(sourceMapper::toDto)
@@ -46,6 +51,7 @@ public class SourceService {
     }
 
     @Transactional
+    @CacheEvict(value = {"sourceDetails", "source"}, allEntries = true)
     public void saveOrUpdateAll(List<SourceDetails> sourceDetailsList) {
 
         Map<String, SourceDetails> detailsByName = sourceDetailsList.stream()
@@ -104,6 +110,7 @@ public class SourceService {
     }
 
     @Transactional
+    @CacheEvict(value = {"sourceDetails", "source"}, allEntries = true)
     public SourceDetails update(Long id, SourceDetails sourceDetails) {
         Source source = sourceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Source not found with id: " + id));
@@ -121,6 +128,7 @@ public class SourceService {
     }
 
     @Transactional
+    @CacheEvict(value = {"sourceDetails", "source"}, key = "#id")
     public void delete(Long id) {
         if (!sourceRepository.existsById(id)) {
             throw new IllegalArgumentException("Source not found with id: " + id);
@@ -131,6 +139,7 @@ public class SourceService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "source", key = "#sourceNames")
     public List<Source> findAllBySourceNames(List<String> sourceNames) {
         return sourceRepository.findAllBySourceNames(sourceNames);
     }

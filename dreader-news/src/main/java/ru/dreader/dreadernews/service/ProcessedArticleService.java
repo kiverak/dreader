@@ -88,7 +88,7 @@ public class ProcessedArticleService {
     }
 
     @Transactional
-    public void delete(List<Long> iDs) {
-        processedArticleRepository.deleteAllById(iDs);
+    public void delete(List<Long> ids) {
+        processedArticleRepository.deleteAllById(ids);
     }
 }
