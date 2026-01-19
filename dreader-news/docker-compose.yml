@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 services:
   postgres:
     image: postgres:18.1-alpine
@@ -17,6 +17,13 @@ services:
     container_name: dreader-redis
     ports:
       - "6379:6379"
+    command: >
+      redis-server
+        --appendonly no   # Redis as cache → no need persistency 
+        --save ""         # no RDB snapshots
+        --maxmemory 256mb
+        --maxmemory-policy allkeys-lru
+    restart: unless-stopped
 
 volumes:
   postgres_data:
