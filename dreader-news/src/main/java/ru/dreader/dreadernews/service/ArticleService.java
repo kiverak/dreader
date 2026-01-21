@@ -13,6 +13,7 @@ import ru.dreader.dreadernews.mapper.ArticleMapper;
 import ru.dreader.dreadernews.repo.ArticleRepository;
 import ru.dreader.mvc.exception.ResourceNotFoundException;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +28,12 @@ public class ArticleService {
     public void saveAll(List<ArticleDto> articleDtoList) {
         List<Article> articles = articleMapper.toEntity(articleDtoList);
         articleRepository.saveAll(articles);
+    }
+
+    @Transactional
+    public void save(ArticleDto articleDto) {
+        Article article = articleMapper.toEntity(articleDto);
+        articleRepository.save(article);
     }
 
     @Transactional(readOnly = true)
@@ -70,5 +77,14 @@ public class ArticleService {
     @Transactional
     public void delete(List<Long> ids) {
         articleRepository.deleteAllById(ids);
+    }
+
+    public boolean checkIfExist(String url) {
+        return articleRepository.existsByUrl(url);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> getOldArticleIds(Instant now) {
+        return articleRepository.findOldArticleIds(now);
     }
 }

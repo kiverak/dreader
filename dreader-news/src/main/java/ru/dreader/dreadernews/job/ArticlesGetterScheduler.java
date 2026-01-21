@@ -26,7 +26,7 @@ public class ArticlesGetterScheduler {
         this.sourceService = sourceService;
     }
 
-    @Scheduled(fixedRate = 5_000) // каждые 5 секунд
+//    @Scheduled(fixedRate = 5_000) // каждые 5 секунд
     public void getArticles() {
         List<SourceDetails> allSources = articleParserClient.getAllSources();
         sourceService.saveOrUpdateAll(allSources);

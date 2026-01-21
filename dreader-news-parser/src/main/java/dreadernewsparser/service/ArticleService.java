@@ -6,8 +6,6 @@ import dreadernewsparser.mapper.ArticleMapper;
 import dreadernewsparser.repo.ArticleRepository;
 import dto.ArticleDto;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,8 +16,6 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class ArticleService {
-
-    private static final Logger log = LoggerFactory.getLogger(ArticleService.class);
 
     private final ArticleRepository articleRepository;
     private final ArticleMapper articleMapper;

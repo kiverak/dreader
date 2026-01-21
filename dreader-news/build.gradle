@@ -50,6 +50,8 @@ dependencies {
     implementation "org.flywaydb:flyway-database-postgresql:11.20.1"
     implementation("net.javacrumbs.shedlock:shedlock-spring:7.5.0")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.5.0")
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.hibernate.validator:hibernate-validator'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

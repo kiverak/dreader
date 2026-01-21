@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import ru.dreader.dreadernews.service.ArticleService;
 import ru.dreader.dreadernews.service.PostService;
 import ru.dreader.dreadernews.service.ProcessedArticleService;
 
@@ -16,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OldEntityCleaner {
 
+    private final ArticleService articleService;
     private final PostService postService;
     private final ProcessedArticleService processedArticleService;
 
@@ -26,10 +28,29 @@ public class OldEntityCleaner {
         log.info("Entity cleaning scheduler started...");
         Instant now = Instant.now();
 
+        cleanOldArticles(now);
         cleanOldUnpublishedPosts(now);
         cleanOldProcessedArticles(now);
 
         log.info("Entity cleaning scheduler finished");
+    }
+
+    private void cleanOldArticles(Instant now) {
+        log.info("Cleaning old articles started...");
+
+        try {
+            List<Long> ids = articleService.getOldArticleIds(now);
+
+            if (ids.isEmpty()) {
+                log.info("No old articles to clean");
+                return;
+            }
+
+            articleService.delete(ids);
+            log.info("Old articles cleaned: {}", ids.size());
+        } catch (Exception e) {
+            log.error("Failed to clean old articles", e);
+        }
     }
 
     private void cleanOldUnpublishedPosts(Instant now) {
