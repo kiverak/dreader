@@ -131,6 +131,19 @@ services:
       - controller-2
       - controller-3
 
+  redis:
+    image: redis:8.4.0-alpine
+    container_name: dreader-redis
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server
+        --appendonly no
+        --save ""
+        --maxmemory 256mb
+        --maxmemory-policy allkeys-lru
+    restart: on-failure
+
 volumes:
   controller-1-data:
   controller-2-data:

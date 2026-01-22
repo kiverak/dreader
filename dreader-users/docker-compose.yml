@@ -12,6 +12,7 @@ services:
       POSTGRES_PASSWORD: root
     ports:
       - "5432:5432"
+    restart: on-failure
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -22,6 +23,7 @@ services:
     command: start-dev
     ports:
       - "8180:8080"
+    restart: on-failure
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/dreader_users
@@ -45,6 +47,7 @@ services:
       POSTGRES_PASSWORD: root
     ports:
       - "5434:5432"
+    restart: on-failure
     volumes:
       - users_pgdata:/var/lib/postgresql/data
     networks:
