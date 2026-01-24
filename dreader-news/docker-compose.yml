@@ -11,19 +11,6 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-  
-  redis:
-    image: redis:8.4.0-alpine
-    container_name: dreader-redis
-    ports:
-      - "6379:6379"
-    command: >
-      redis-server
-        --appendonly no   # Redis as cache → no need persistency 
-        --save ""         # no RDB snapshots
-        --maxmemory 256mb
-        --maxmemory-policy allkeys-lru
-    restart: unless-stopped
 
 volumes:
   postgres_data:

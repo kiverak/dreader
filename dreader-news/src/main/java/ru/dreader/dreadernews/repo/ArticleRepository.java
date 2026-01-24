@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.dreader.dreadernews.entity.Article;
 
+import java.time.Instant;
 import java.util.List;
 
 @Repository
@@ -21,4 +22,11 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
             """)
     List<Article> findEarliestFor24HoursNotParsed(Pageable pageable);
 
+    boolean existsByUrl(String url);
+
+    @Query("""
+            SELECT a.id FROM Article a
+            WHERE a.createdAt < :now - 1 DAY
+            """)
+    List<Long> findOldArticleIds(Instant now);
 }

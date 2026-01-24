@@ -153,4 +153,9 @@ public class SourceService {
     public Source getByProcessedArticleId(Long id) {
         return sourceRepository.findByProcessedArticleId(id).orElseThrow(() -> new ResourceNotFoundException("Source not found for processed article id: " + id));
     }
+
+    @Transactional(readOnly = true)
+    public Source getByName(String name) {
+        return sourceRepository.findByName(name).orElseThrow(() -> new ResourceNotFoundException("Source not found with name: " + name));
+    }
 }

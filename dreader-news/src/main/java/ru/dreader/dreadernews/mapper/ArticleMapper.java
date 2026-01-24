@@ -39,6 +39,7 @@ public class ArticleMapper {
         article.setImageUrl(articleDto.imageUrl());
         article.setPublicationDate(articleDto.publicationDate());
         article.setTags(tagService.getOrCreateByNames(articleDto.tags()));
+        article.setSource(sourceService.getByName(articleDto.sourceName()));
 
         return article;
     }

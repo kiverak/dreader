@@ -45,7 +45,7 @@ public class LLMArticleProcessor {
 
         if (processedArticle == null) {
             try {
-                Thread.sleep(5000); // нет работы — подождём 5 секунд
+                Thread.sleep(5000); // if no work — wait 5 seconds
             } catch (InterruptedException ignored) {
             }
             return false;
@@ -81,7 +81,7 @@ public class LLMArticleProcessor {
 
         if (articles.isEmpty()) {
             try {
-                Thread.sleep(5000); // нет работы — подождём 5 секунд
+                Thread.sleep(5000); // if no work — wait 5 seconds
             } catch (InterruptedException ignored) {
             }
             return null;

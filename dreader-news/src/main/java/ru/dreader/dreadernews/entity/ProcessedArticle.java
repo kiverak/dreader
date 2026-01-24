@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import ru.dreader.mvc.entity.AuditEntity;
-import ru.dreader.mvc.entity.BaseEntity;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ public class ProcessedArticle extends AuditEntity {
 
     private boolean llmParsed = false;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany
     @JoinTable(
             name = "processed_article_category",
             joinColumns = @JoinColumn(name = "processed_article_id"),
