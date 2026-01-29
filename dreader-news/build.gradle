@@ -22,6 +22,7 @@ configurations {
 
 ext {
     set('springCloudVersion', "2025.0.1")
+    set('swaggerVersion', "3.0.1")
 }
 
 dependencies {
@@ -52,6 +53,8 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.5.0")
     implementation 'org.springframework.kafka:spring-kafka'
     implementation 'org.hibernate.validator:hibernate-validator'
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${swaggerVersion}")
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

@@ -24,7 +24,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/api/public/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/user/**").hasRole("USER")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
@@ -37,7 +37,7 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/api/public/**");
+        return (web) -> web.ignoring().requestMatchers("/api/public/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html");
     }
 
     @Bean
