@@ -1,6 +1,7 @@
 package ru.dreader.dreadernews.web;
 
 import dto.ArticleDto;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -12,10 +13,13 @@ import java.util.List;
 @Component
 public class ArticleParserClient {
 
+    @Value("${urls.gateway}")
+    private String gatewayUrl;
+
     private final WebClient webClient;
 
     public ArticleParserClient(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8765/parser/api").build();
+        this.webClient = webClientBuilder.baseUrl(gatewayUrl + "/parser/api").build();
     }
 
     public List<ArticleDto> getNews() {
