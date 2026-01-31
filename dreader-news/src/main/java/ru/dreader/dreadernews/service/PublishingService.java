@@ -32,7 +32,7 @@ public class PublishingService {
     private final PublishResultService publishResultService;
     private final PostRepository postRepository;
 
-    @Async
+    @Async("asyncExecutor")
     @CacheEvict(value = "publishedPosts", allEntries = true)
     @Transactional
     public void publishPost(CategoryDto category) {
