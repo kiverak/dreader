@@ -24,7 +24,7 @@ public class ArticleAiServiceImpl implements ArticleAiService {
 
     @Override
     public ArticleAiAnalysis analyze(String title, String bodyPlainText, List<String> rawTags, Locale locale) {
-        log.info("LLM call started");
+        log.info("LLM analyze call started");
         String prompt = buildPrompt(title, bodyPlainText, rawTags, locale);
 
         Instant now = Instant.now();
@@ -35,7 +35,7 @@ public class ArticleAiServiceImpl implements ArticleAiService {
 
         Instant then = Instant.now();
 
-        log.info("LLM call duration: {} s", (then.toEpochMilli() - now.toEpochMilli()) / 1000.0);
+        log.info("LLM analyze call duration: {} s", (then.toEpochMilli() - now.toEpochMilli()) / 1000.0);
 
         return parseResponse(response);
     }

@@ -25,7 +25,7 @@ public class CategorizingService {
     }
 
     public CategorizingResponse rankArticles(CategorizingRequest request, Locale locale) {
-        log.info("LLM call started");
+        log.info("LLM categorizing call started");
         String prompt = buildPrompt(request.articles(), request.categories(), locale);
 
         Instant now = Instant.now();
@@ -36,7 +36,7 @@ public class CategorizingService {
         
         Instant then = Instant.now();
         
-        log.info("LLM call duration: {} s", (then.toEpochMilli() - now.toEpochMilli()) / 1000.0);
+        log.info("LLM categorizing call duration: {} s", (then.toEpochMilli() - now.toEpochMilli()) / 1000.0);
 
         return parseResponse(response);
     }
