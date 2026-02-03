@@ -22,7 +22,7 @@ public class HttpClientConfig {
                 .header("Sec-Fetch-Mode", "navigate")
                 .header("Sec-Fetch-Site", "none")
                 .header("Sec-Fetch-User", "?1")
-                .timeout(10_000).ignoreContentType(true)
+                .timeout(20_000).ignoreContentType(true)
                 .ignoreHttpErrors(true);
     }
 }
