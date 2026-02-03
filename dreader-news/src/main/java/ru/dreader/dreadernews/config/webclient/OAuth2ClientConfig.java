@@ -1,7 +1,9 @@
-package ru.dreader.dreadernews.config;
+package ru.dreader.dreadernews.config.webclient;
 
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
@@ -16,13 +18,14 @@ WebClient, который автоматически получает серви
 автоматически добавляет Authorization: Bearer <token>
  */
 @Configuration
-public class OAuth2ClientConfig {
+@EnableConfigurationProperties(WebClientProperties.class)
+public class OAuth2ClientConfig extends BaseWebClientConfig {
 
     @Bean
     public OAuth2AuthorizedClientManager authorizedClientManager(
             ClientRegistrationRepository registrations,
-            OAuth2AuthorizedClientService clientService) {
-
+            OAuth2AuthorizedClientService clientService
+    ) {
         var provider = OAuth2AuthorizedClientProviderBuilder.builder()
                 .clientCredentials()
                 .build();
@@ -34,13 +37,19 @@ public class OAuth2ClientConfig {
     }
 
     @Bean
-    public WebClient serviceWebClient(OAuth2AuthorizedClientManager manager) {
+    public WebClient serviceWebClient(
+            OAuth2AuthorizedClientManager manager,
+            WebClientProperties props
+    ) {
+        var cfg = cfg(props, "service-client");
+
         var oauth = new ServletOAuth2AuthorizedClientExchangeFilterFunction(manager);
         oauth.setDefaultClientRegistrationId("keycloak-service");
 
         return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(createHttpClient(cfg)))
                 .apply(oauth.oauth2Configuration())
+                .filter(retryFilter(cfg))
                 .build();
     }
 }
-

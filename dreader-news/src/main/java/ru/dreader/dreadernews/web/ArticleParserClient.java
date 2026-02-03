@@ -1,25 +1,28 @@
 package ru.dreader.dreadernews.web;
 
 import dto.ArticleDto;
+import dto.SourceDetails;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import dto.SourceDetails;
 
 import java.util.List;
 
 @Component
 public class ArticleParserClient {
 
-    @Value("${urls.gateway}")
-    private String gatewayUrl;
-
     private final WebClient webClient;
 
-    public ArticleParserClient(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl(gatewayUrl + "/parser/api").build();
+    public ArticleParserClient(
+            @Qualifier("defaultWebClient") WebClient defaultWebClient,
+            @Value("${urls.gateway}") String gatewayUrl
+    ) {
+        this.webClient = defaultWebClient.mutate()
+                .baseUrl(gatewayUrl + "/parser/api")
+                .build();
     }
 
     public List<ArticleDto> getNews() {
@@ -27,8 +30,8 @@ public class ArticleParserClient {
                 .uri("/news")
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, response ->
-                    response.bodyToMono(String.class)
-                            .flatMap(errorBody -> Mono.error(new RuntimeException("Error getting news: " + errorBody)))
+                        response.bodyToMono(String.class)
+                                .flatMap(errorBody -> Mono.error(new RuntimeException("Error getting news: " + errorBody)))
                 )
                 .bodyToFlux(ArticleDto.class)
                 .collectList()
@@ -40,8 +43,8 @@ public class ArticleParserClient {
                 .uri("/source")
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, response ->
-                    response.bodyToMono(String.class)
-                            .flatMap(errorBody -> Mono.error(new RuntimeException("Error getting sources: " + errorBody)))
+                        response.bodyToMono(String.class)
+                                .flatMap(errorBody -> Mono.error(new RuntimeException("Error getting sources: " + errorBody)))
                 )
                 .bodyToFlux(SourceDetails.class)
                 .collectList()
@@ -54,8 +57,8 @@ public class ArticleParserClient {
                 .body(Mono.just(sourceDetails), SourceDetails.class)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, response ->
-                    response.bodyToMono(String.class)
-                            .flatMap(errorBody -> Mono.error(new RuntimeException("Error creating source: " + errorBody)))
+                        response.bodyToMono(String.class)
+                                .flatMap(errorBody -> Mono.error(new RuntimeException("Error creating source: " + errorBody)))
                 )
                 .bodyToMono(SourceDetails.class)
                 .block();
@@ -67,8 +70,8 @@ public class ArticleParserClient {
                 .body(Mono.just(sourceDetails), SourceDetails.class)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, response ->
-                    response.bodyToMono(String.class)
-                            .flatMap(errorBody -> Mono.error(new RuntimeException("Error updating source: " + errorBody)))
+                        response.bodyToMono(String.class)
+                                .flatMap(errorBody -> Mono.error(new RuntimeException("Error updating source: " + errorBody)))
                 )
                 .bodyToMono(SourceDetails.class)
                 .block();
@@ -79,8 +82,8 @@ public class ArticleParserClient {
                 .uri("/source/{id}", id)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, response ->
-                    response.bodyToMono(String.class)
-                            .flatMap(errorBody -> Mono.error(new RuntimeException("Error deleting source: " + errorBody)))
+                        response.bodyToMono(String.class)
+                                .flatMap(errorBody -> Mono.error(new RuntimeException("Error deleting source: " + errorBody)))
                 )
                 .bodyToMono(Void.class)
                 .block();

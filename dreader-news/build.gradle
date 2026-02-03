@@ -22,7 +22,10 @@ configurations {
 
 ext {
     set('springCloudVersion', "2025.0.1")
-    set('swaggerVersion', "3.0.1")
+    set('swaggerVersion', "2.8.15")
+    set('hibernateTypesVersion', "2.21.1")
+    set('flywayVersion', "11.20.1")
+    set('shedlockVersion', "7.5.0")
 }
 
 dependencies {
@@ -46,11 +49,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     runtimeOnly 'org.postgresql:postgresql'
-    implementation 'com.vladmihalcea:hibernate-types-60:2.21.1'
-    implementation "org.flywaydb:flyway-core:11.20.1"
-    implementation "org.flywaydb:flyway-database-postgresql:11.20.1"
-    implementation("net.javacrumbs.shedlock:shedlock-spring:7.5.0")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.5.0")
+    implementation "com.vladmihalcea:hibernate-types-60:${hibernateTypesVersion}"
+    implementation "org.flywaydb:flyway-core:${flywayVersion}"
+    implementation "org.flywaydb:flyway-database-postgresql:${flywayVersion}"
+    implementation("net.javacrumbs.shedlock:shedlock-spring:${shedlockVersion}")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:${shedlockVersion}")
     implementation 'org.springframework.kafka:spring-kafka'
     implementation 'org.hibernate.validator:hibernate-validator'
 
