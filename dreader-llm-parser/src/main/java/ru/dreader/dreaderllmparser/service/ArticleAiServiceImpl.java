@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
+import ru.dreader.dreaderllmparser.debugLogging.DebugLog;
 import ru.dreader.dreaderllmparser.dto.ArticleAiAnalysis;
 import ru.dreader.dreaderllmparser.utils.LLMJsonCleaner;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -22,20 +22,14 @@ public class ArticleAiServiceImpl implements ArticleAiService {
         this.chatClient = builder.build();
     }
 
+    @DebugLog
     @Override
     public ArticleAiAnalysis analyze(String title, String bodyPlainText, List<String> rawTags, Locale locale) {
-        log.info("LLM analyze call started");
         String prompt = buildPrompt(title, bodyPlainText, rawTags, locale);
-
-        Instant now = Instant.now();
 
         String response = chatClient.prompt(prompt)
                 .call()
                 .content();
-
-        Instant then = Instant.now();
-
-        log.info("LLM analyze call duration: {} s", (then.toEpochMilli() - now.toEpochMilli()) / 1000.0);
 
         return parseResponse(response);
     }

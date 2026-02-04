@@ -8,3 +8,8 @@ spring:
 
 server:
   port: 18080
+
+logging:
+  level:
+    root: INFO
+    ru.dreader.dreaderllmparser.debugLogging: DEBUG

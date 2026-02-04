@@ -9,6 +9,7 @@ import ru.dreader.dreadernews.dto.CategoryDto;
 import ru.dreader.dreadernews.entity.Category;
 import ru.dreader.dreadernews.enums.Language;
 import ru.dreader.dreadernews.repo.CategoryRepository;
+import ru.dreader.mvc.debugLogging.DebugLog;
 import ru.dreader.mvc.exception.ResourceNotFoundException;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
+    @DebugLog
     @Transactional(readOnly = true)
     @Cacheable(value = "categories", key = "#root.method.name")
     public List<CategoryDto> getAll() {

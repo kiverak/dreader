@@ -6,10 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
+import ru.dreader.dreaderllmparser.debugLogging.DebugLog;
 import ru.dreader.dreaderllmparser.dto.*;
 import ru.dreader.dreaderllmparser.utils.LLMJsonCleaner;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 
@@ -24,19 +24,13 @@ public class CategorizingService {
         this.chatClient = builder.build();
     }
 
+    @DebugLog
     public CategorizingResponse rankArticles(CategorizingRequest request, Locale locale) {
-        log.info("LLM categorizing call started");
         String prompt = buildPrompt(request.articles(), request.categories(), locale);
-
-        Instant now = Instant.now();
 
         String response = chatClient.prompt(prompt)
                 .call()
                 .content();
-        
-        Instant then = Instant.now();
-        
-        log.info("LLM categorizing call duration: {} s", (then.toEpochMilli() - now.toEpochMilli()) / 1000.0);
 
         return parseResponse(response);
     }
@@ -98,7 +92,6 @@ public class CategorizingService {
 
         return sb.toString();
     }
-
 
     private CategorizingResponse parseResponse(String json) {
         try {

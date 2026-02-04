@@ -9,6 +9,7 @@ import ru.dreader.dreadernews.dto.ArticleResponse;
 import ru.dreader.dreadernews.dto.CategorizingRequest;
 import ru.dreader.dreadernews.dto.CategorizingResponse;
 import ru.dreader.dreadernews.dto.ParseRequest;
+import ru.dreader.mvc.debugLogging.DebugLog;
 
 @Component
 public class LLMParserClient {
@@ -20,6 +21,7 @@ public class LLMParserClient {
         this.webClient = webClientBuilder.baseUrl(url + "/api").build();
     }
 
+    @DebugLog
     public ArticleResponse parseArticle(final ParseRequest request) {
         return webClient.post()
                 .uri("/parse")
@@ -33,6 +35,7 @@ public class LLMParserClient {
                 .block();
     }
 
+    @DebugLog
     public CategorizingResponse categorizeArticles(final CategorizingRequest request) {
         return webClient.post()
                 .uri("/categorize")
