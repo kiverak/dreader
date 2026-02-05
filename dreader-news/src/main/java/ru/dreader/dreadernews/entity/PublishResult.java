@@ -19,7 +19,6 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class PublishResult extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

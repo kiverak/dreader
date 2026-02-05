@@ -22,7 +22,6 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Channel extends AuditEntity {
 
     @Enumerated(EnumType.STRING)

@@ -23,7 +23,6 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Post extends BaseEntity {
 
     @Column(columnDefinition = "text", nullable = false)

@@ -16,7 +16,6 @@ import ru.dreader.mvc.entity.BaseEntity;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class PostMedia extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
