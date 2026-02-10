@@ -21,6 +21,8 @@ public class UserEntity {
 
     private String email;
     private String username;
+    private String firstName;
+    private String lastName;
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
 

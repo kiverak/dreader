@@ -8,3 +8,7 @@ CREATE TABLE users
     created_at       TIMESTAMP WITH TIME ZONE,
     updated_at       TIMESTAMP WITH TIME ZONE
 );
+
+ALTER TABLE users
+    ADD COLUMN first_name VARCHAR(255),
+    ADD COLUMN last_name  VARCHAR(255);

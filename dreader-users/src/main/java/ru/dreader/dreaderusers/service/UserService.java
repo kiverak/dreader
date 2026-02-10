@@ -81,8 +81,8 @@ public class UserService {
 
     @Transactional
     public dto.UserInfo createUser(UserDto userDto) {
-        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(409), "User with this email already exists: " + userDto.getEmail());
+        if (userRepository.findByEmail(userDto.email()).isPresent()) {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(409), "User with this email already exists: " + userDto.email());
         }
 
         String keycloakUserId = keycloakUserService.createUserInKeycloak(userDto, List.of("ROLE_USER"));

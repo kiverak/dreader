@@ -57,15 +57,17 @@ public class KeycloakUserService {
     }
 
     public String createUserInKeycloak(UserDto userDto, List<String> roles) {
-        log.info("Creating user in Keycloak: {}", userDto.getEmail());
+        log.info("Creating user in Keycloak: {}", userDto.email());
         Map<String, Object> payload = Map.of(
-                "username", userDto.getUsername(),
-                "email", userDto.getEmail(),
+                "username", userDto.username(),
+                "email", userDto.email(),
+                "firstName", userDto.firstName(),
+                "lastName", userDto.lastName(),
                 "enabled", true,
                 "credentials", List.of(
                         Map.of(
                                 "type", "password",
-                                "value", userDto.getPassword(),
+                                "value", userDto.password(),
                                 "temporary", false
                         )
                 )
@@ -79,7 +81,7 @@ public class KeycloakUserService {
                 .onStatus(status -> status.value() == 409,
                         resp -> resp.bodyToMono(String.class)
                                 .map(body -> new UserAlreadyExistsException(
-                                        "User already exists: " + userDto.getEmail() + ". Keycloak says: " + body
+                                        "User already exists: " + userDto.email() + ". Keycloak says: " + body
                                 ))
                 )
                 .onStatus(HttpStatusCode::is4xxClientError,
@@ -96,7 +98,7 @@ public class KeycloakUserService {
                 })
                 .block();
 
-        log.info("User with email {} created in Keycloak with ID: {}", userDto.getEmail(), userId);
+        log.info("User with email {} created in Keycloak with ID: {}", userDto.email(), userId);
 
         if (roles != null && !roles.isEmpty()) {
             assignRolesToUser(userId, roles);
@@ -144,19 +146,19 @@ public class KeycloakUserService {
     }
 
     public void updateKeycloakUser(UserDto userDto) {
-        log.info("Updating Keycloak user {}", userDto.getEmail());
-        List<Map<String, Object>> users = searchKeycloakUsersByEmail(userDto.getEmail());
+        log.info("Updating Keycloak user {}", userDto.email());
+        List<Map<String, Object>> users = searchKeycloakUsersByEmail(userDto.email());
 
         if (users.isEmpty()) {
-            throw new UserNotFoundException("User not found in Keycloak with email: " + userDto.getEmail());
+            throw new UserNotFoundException("User not found in Keycloak with email: " + userDto.email());
         }
 
         String userId = (String) users.getFirst().get("id");
 
         // Update profile
         Map<String, Object> payload = new HashMap<>();
-        payload.put("email", userDto.getEmail());
-        payload.put("username", userDto.getUsername());
+        payload.put("email", userDto.email());
+        payload.put("username", userDto.username());
         payload.put("enabled", true);
 
         adminWebClient
@@ -172,11 +174,11 @@ public class KeycloakUserService {
                 .block();
 
         // If password is provided, update it
-        if (userDto.getPassword() != null && !userDto.getPassword().isBlank()) {
+        if (userDto.password() != null && !userDto.password().isBlank()) {
 
             Map<String, Object> passwordPayload = Map.of(
                     "type", "password",
-                    "value", userDto.getPassword(),
+                    "value", userDto.password(),
                     "temporary", false
             );
 
@@ -193,7 +195,7 @@ public class KeycloakUserService {
                     .block();
         }
 
-        log.info("Keycloak user {} updated", userDto.getEmail());
+        log.info("Keycloak user {} updated", userDto.email());
     }
 
     public void deleteKeycloakUser(String userId) {

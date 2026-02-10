@@ -1,5 +1,6 @@
 package ru.dreader.dreaderusers.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +17,7 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public dto.UserInfo createUser(@RequestBody UserDto userDto) {
+    public dto.UserInfo createUser(@RequestBody @Valid UserDto userDto) {
         return userService.createUser(userDto);
     }
 

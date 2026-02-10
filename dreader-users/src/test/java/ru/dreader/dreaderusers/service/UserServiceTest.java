@@ -6,10 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.server.ResponseStatusException;
 import ru.dreader.dreaderusers.dto.UserDto;
@@ -22,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -119,10 +115,7 @@ class UserServiceTest {
     @Test
     void createUser_shouldCreateNewUser() {
         // Given
-        UserDto userDto = new UserDto();
-        userDto.setUsername("newuser");
-        userDto.setEmail("new@example.com");
-        userDto.setPassword("password123");
+        UserDto userDto = new UserDto("new@example.com", "newuser", "password123", "First", "Last", "tg", false);
 
         UserEntity savedEntity = new UserEntity();
         savedEntity.setId("new-user-id");
@@ -130,7 +123,7 @@ class UserServiceTest {
 
         UserInfo expectedUserInfo = new UserInfo();
 
-        when(userRepository.findByEmail(userDto.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(userDto.email())).thenReturn(Optional.empty());
         when(keycloakUserService.createUserInKeycloak(userDto, List.of("ROLE_USER"))).thenReturn("new-user-id");
         when(userToUserDtoMapper.toUser(userDto)).thenReturn(new UserEntity());
         when(userRepository.save(any(UserEntity.class))).thenReturn(savedEntity);
@@ -141,7 +134,7 @@ class UserServiceTest {
 
         // Then
         assertNotNull(result);
-        verify(userRepository).findByEmail(userDto.getEmail());
+        verify(userRepository).findByEmail(userDto.email());
         verify(keycloakUserService).createUserInKeycloak(userDto, List.of("ROLE_USER"));
         verify(userRepository).save(any(UserEntity.class));
     }
@@ -149,17 +142,16 @@ class UserServiceTest {
     @Test
     void createUser_shouldThrowException_whenEmailAlreadyExists() {
         // Given
-        UserDto userDto = new UserDto();
-        userDto.setEmail("existing@example.com");
+        UserDto userDto = new UserDto("existing@example.com", "user", "pass", "First", "Last", "tg", false);
 
         UserEntity existingEntity = new UserEntity();
         existingEntity.setEmail("existing@example.com");
 
-        when(userRepository.findByEmail(userDto.getEmail())).thenReturn(Optional.of(existingEntity));
+        when(userRepository.findByEmail(userDto.email())).thenReturn(Optional.of(existingEntity));
 
         // When & Then
         assertThrows(ResponseStatusException.class, () -> userService.createUser(userDto));
-        verify(userRepository).findByEmail(userDto.getEmail());
+        verify(userRepository).findByEmail(userDto.email());
         verify(keycloakUserService, never()).createUserInKeycloak(any(), any());
     }
 
@@ -167,9 +159,7 @@ class UserServiceTest {
     void updateUser_shouldUpdateUser_whenExists() {
         // Given
         String userId = "user1";
-        UserDto updateDto = new UserDto();
-        updateDto.setUsername("updated");
-        updateDto.setEmail("updated@example.com");
+        UserDto updateDto = new UserDto("updated@example.com", "updated", null, "First", "Last", "tg", false);
 
         UserEntity userEntity = new UserEntity();
         userEntity.setId(userId);
