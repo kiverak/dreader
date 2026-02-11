@@ -2,10 +2,9 @@ package ru.dreader.dreadernews.controller;
 
 import dto.ArticleDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import ru.dreader.dreadernews.service.ArticleService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/articles")
@@ -20,7 +19,7 @@ public class AdminArticleController {
     }
 
     @GetMapping
-    public List<ArticleDto> getLast(
+    public Page<ArticleDto> getLast(
             @RequestParam(required = false) Long tagId,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "0") Integer page,

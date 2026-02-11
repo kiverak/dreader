@@ -15,7 +15,6 @@ import ru.dreader.mvc.exception.ResourceNotFoundException;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,20 +42,18 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
-    public List<ArticleDto> getLast(Long tagId, Integer size, Integer page, String sort, String order) {
+    public Page<ArticleDto> getLast(Long tagId, Integer size, Integer page, String sort, String order) {
         Sort sortBy = Sort.by(Sort.Direction.fromString(order != null ? order : "DESC"), sort);
         Pageable pageable = PageRequest.of(page, size, sortBy);
 
         Page<Article> articlePage;
         if (tagId != null) {
-             articlePage = articleRepository.findByTags_Id(tagId, pageable);
+            articlePage = articleRepository.findByTags_Id(tagId, pageable);
         } else {
             articlePage = articleRepository.findAll(pageable);
         }
 
-        return articlePage.getContent().stream()
-                .map(articleMapper::toDto)
-                .collect(Collectors.toList());
+        return articlePage.map(articleMapper::toDto);
     }
 
     @Transactional(readOnly = true)
