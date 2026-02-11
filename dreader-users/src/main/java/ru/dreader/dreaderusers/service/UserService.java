@@ -1,6 +1,12 @@
 package ru.dreader.dreaderusers.service;
 
+import dto.UserInfo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,43 +30,32 @@ public class UserService {
     private final KeycloakUserService keycloakUserService;
     private final UserRepository userRepository;
     private final UserToUserDtoMapper userToUserDtoMapper;
-    private final KeycloakUserSyncService keycloakUserSyncService;
+    private final UserCacheService userCacheService;
 
     @Transactional(readOnly = true)
     public dto.UserInfo getUserInfoByEmail(final String email) {
-        return getUserFromRepoByEmail(email);
+        return userCacheService.getCachedUserFromRepoByEmail(email);
     }
 
     @Transactional(readOnly = true)
     public dto.UserInfo getUserInfoById(String id) {
-        UserEntity userEntity = userRepository.findById(id)
-                .orElseGet(() -> keycloakUserSyncService.syncUserFromKeycloakIfExists(id, false));
-        if (userEntity == null) {
-            throw new UserNotFoundException("User not found with keycloakId: " + id);
-        }
-        if (userEntity.isDeleted()) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(400), "User with this id deleted: " + id);
-        }
-        return userToUserDtoMapper.toUserInfo(userEntity);
+        return userCacheService.getCachedUserInfoById(id);
     }
 
     @Transactional(readOnly = true)
     public dto.UserInfo getCurrentUserInfo() {
         Jwt jwt = getCurrentJwt();
         String email = jwt.getClaimAsString("email");
-        return getUserFromRepoByEmail(email);
+        return userCacheService.getCachedUserFromRepoByEmail(email);
     }
 
-    private dto.UserInfo getUserFromRepoByEmail(String email) {
-        UserEntity userEntity = userRepository.findByEmail(email)
-                .orElseGet(() -> keycloakUserSyncService.syncUserFromKeycloakIfExists(email, true));
-        if (userEntity == null) {
-            throw new UserNotFoundException("User not found with email: " + email);
-        }
-        if (userEntity.isDeleted()) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(400), "User with this email deleted: " + email);
-        }
-        return userToUserDtoMapper.toUserInfo(userEntity);
+    @Transactional(readOnly = true)
+    public Page<UserInfo> getUsers(Integer size, Integer page, String sort, String order) {
+        Sort sortBy = Sort.by(Sort.Direction.fromString(order != null ? order : "DESC"), sort);
+        Pageable pageable = PageRequest.of(page, size, sortBy);
+        Page<UserEntity> userPage = userRepository.findAll(pageable);
+
+        return userPage.map(userToUserDtoMapper::toUserInfo);
     }
 
     public Jwt getCurrentJwt() {
@@ -94,6 +89,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "user", key = "#id")
     public dto.UserInfo updateUser(String id, UserDto userDto) {
         UserEntity userEntity = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         if (userEntity.isDeleted()) {
@@ -107,6 +103,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "user", key = "#id")
     public void deleteUser(String id) {
         UserEntity userEntity = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         keycloakUserService.deleteKeycloakUser(id);
