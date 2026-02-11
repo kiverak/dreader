@@ -10,10 +10,12 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import reactor.util.retry.Retry;
 
+import java.net.URI;
 import java.time.Duration;
 
 /**
@@ -45,21 +47,30 @@ public class KeycloakLogoutHandler implements LogoutHandler {
     }
 
     private void logoutFromKeycloak(OidcUser user) {
-        String endSessionEndpoint = user.getIssuer() + "/protocol/openid-connect/logout";
+        String endSessionEndpoint = user.getIssuer().toString();
+        if (endSessionEndpoint.endsWith("/")) {
+            endSessionEndpoint = endSessionEndpoint.substring(0, endSessionEndpoint.length() - 1);
+        }
 
-        webClient.get().uri(uriBuilder -> uriBuilder
-                        .path(endSessionEndpoint)
-                        .queryParam("id_token_hint", user.getIdToken().getTokenValue())
-                        .build())
+        URI uri = UriComponentsBuilder
+                .fromUriString(endSessionEndpoint)
+                .path("/protocol/openid-connect/logout")
+                .queryParam("id_token_hint", user.getIdToken().getTokenValue())
+                .build(true)
+                .toUri();
+
+        webClient.get()
+                .uri(uri)
                 .retrieve()
                 .toBodilessEntity()
-                .doOnSuccess(resp -> {
-                    log.info("Successfully logged out from Keycloak, email: {}", user.getUserInfo().getEmail());
-                }).doOnError(err -> {
-                    log.error("Failed to propagate logout to Keycloak, email: {}", user.getUserInfo().getEmail(), err);
-                })
+                .doOnSuccess(resp ->
+                        log.info("Successfully logged out from Keycloak, email: {}", user.getUserInfo().getEmail()))
+                .doOnError(err ->
+                        log.error("Failed to propagate logout to Keycloak, email: {}", user.getUserInfo().getEmail(), err
+                ))
                 .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1))
-                        .doBeforeRetry(retrySignal -> log.warn("Retrying logout for {}, attempt {}", user.getUserInfo().getEmail(), retrySignal.totalRetries() + 1)))
+                        .doBeforeRetry(retrySignal ->
+                                log.warn("Retrying logout for {}, attempt {}", user.getUserInfo().getEmail(), retrySignal.totalRetries() + 1)))
                 .onErrorResume(e -> Mono.empty())
                 .block(); // logout — терминальная операция, блокировка допустима
     }

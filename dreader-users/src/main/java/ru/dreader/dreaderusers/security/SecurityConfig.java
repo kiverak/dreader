@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,6 +18,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import ru.dreader.dreaderusers.auth.KeycloakLogoutHandler;
 
 import java.util.List;
@@ -30,51 +32,6 @@ public class SecurityConfig {
 
     private final KeycloakLogoutHandler keycloakLogoutHandler;
     private final ClientRegistrationRepository clientRegistrationRepository;
-
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//
-//        http
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-//
-//                .authorizeHttpRequests(request -> request
-//                        .requestMatchers("/api/auth/register", "/oauth2/**", "/api/test").permitAll()
-//                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-//                        .requestMatchers("/api/user/**").hasRole("USER")
-//                        .requestMatchers("/api/internal/**").hasRole("INTERNAL_SERVICE")
-//                        .anyRequest().authenticated()
-//                )
-//
-//                .exceptionHandling(ex -> ex
-//                        .authenticationEntryPoint((req, res, e) -> {
-//                            String path = req.getRequestURI();
-//                            if (path.startsWith("/api/auth/register")
-//                                    || path.startsWith("/api/test")
-//                                    || path.startsWith("/oauth2/")) {
-//                                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//                                return;
-//                            }
-//                            res.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-//                        }))
-//
-
-    /// /                .oauth2Login(Customizer.withDefaults())
-//                .oauth2Login(oauth -> oauth.loginPage("/oauth2/authorization/keycloak"))
-//
-//                .logout(logout -> logout
-//                        // back-channel logout
-//                        .addLogoutHandler(keycloakLogoutHandler)
-//                        // front-channel logout
-//                        .logoutSuccessHandler(oidcLogoutSuccessHandler())
-//                )
-//
-//                .oauth2ResourceServer(oauth2 -> oauth2
-//                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
-//                );
-//
-//        return http.build();
-//    }
 
     // API
     @Bean
@@ -116,6 +73,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/logout").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -123,6 +81,7 @@ public class SecurityConfig {
                         .loginPage("/oauth2/authorization/dreader-users")
                 )
                 .logout(logout -> logout
+                        .logoutUrl("/logout")
                         .addLogoutHandler(keycloakLogoutHandler)
                         .logoutSuccessHandler(oidcLogoutSuccessHandler())
                 );
