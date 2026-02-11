@@ -1,11 +1,10 @@
 package ru.dreader.dreadernews.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import ru.dreader.dreadernews.dto.PostDto;
 import ru.dreader.dreadernews.service.PostService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/public/posts")
@@ -20,7 +19,7 @@ public class PostController {
     }
 
     @GetMapping
-    public List<PostDto> getPublished(
+    public Page<PostDto> getPublished(
             @RequestParam(required = false) Long categoryId,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "0") Integer page,

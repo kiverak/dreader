@@ -39,7 +39,7 @@ public class PostService {
             key = "T(java.util.Objects).hash(#categoryId, #size, #page, #sort, #order)"
     )
     @Transactional(readOnly = true)
-    public List<PostDto> getPublished(Long categoryId, Integer size, Integer page, String sort, String order) {
+    public Page<PostDto> getPublished(Long categoryId, Integer size, Integer page, String sort, String order) {
         Sort sortBy = Sort.by(Sort.Direction.fromString(order != null ? order : "DESC"), sort);
         Pageable pageable = PageRequest.of(page, size, sortBy);
 
@@ -50,9 +50,7 @@ public class PostService {
             postPage = postRepository.findAll(pageable);
         }
 
-        return postPage.getContent().stream()
-                .map(postMapper::toDto)
-                .toList();
+        return postPage.map(postMapper::toDto);
     }
 
     @Transactional(readOnly = true)
