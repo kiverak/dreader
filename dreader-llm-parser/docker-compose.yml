@@ -6,7 +6,7 @@ services:
     pull_policy: always
     tty: true
     restart: unless-stopped
-    image: docker.io/ollama/ollama:0.14.1
+    image: docker.io/ollama/ollama:0.17.0-rocm
     ports:
       - "11434:11434"
     volumes:

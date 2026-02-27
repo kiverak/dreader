@@ -4,7 +4,7 @@ services:
   # Keycloak database
   # -----------------------------
   postgres:
-    image: postgres:18.1-alpine
+    image: postgres:18-alpine
 #    container_name: dreader-users
     environment:
       POSTGRES_DB: dreader_users
@@ -40,7 +40,7 @@ services:
   # User-service database
   # -----------------------------
   users-postgres:
-    image: postgres:18.1-alpine
+    image: postgres:18-alpine
     environment:
       POSTGRES_DB: dreader_users_data
       POSTGRES_USER: postgres
