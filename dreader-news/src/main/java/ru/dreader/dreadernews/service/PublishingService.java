@@ -89,7 +89,7 @@ public class PublishingService {
     private Post getPostToPublish(CategoryDto category, int maxUpdatePeriodInMinutes, long diffMinutes) {
         // TODO remake ratings with google
         // List<Post> posts = postRepository.findUnpublishedWithMaxRateByCategoryId(category.id());
-        List<Post> posts = postRepository.findUnpublishedByCategoryId(category.id());
+        List<Post> posts = postRepository.findNewUnpublishedByCategoryId(category.id());
 
         if (posts.isEmpty()) {
             return null;

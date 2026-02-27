@@ -43,8 +43,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             JOIN p.categories c
             WHERE c.id = :categoryId
               AND p.status = 'PENDING'
+              AND p.createdAt >= CURRENT_TIMESTAMP - 1 DAY
             """)
-    List<Post> findUnpublishedByCategoryId(Long categoryId);
+    List<Post> findNewUnpublishedByCategoryId(Long categoryId);
 
     @Query("""
             SELECT p.id FROM Post p

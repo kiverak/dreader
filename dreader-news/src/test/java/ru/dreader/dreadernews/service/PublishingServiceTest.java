@@ -59,7 +59,7 @@ class PublishingServiceTest {
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("updatedAt").descending());
 
         when(postRepository.findPublishedByCategoryId(category.id(), pageRequest)).thenReturn(Collections.emptyList());
-        when(postRepository.findUnpublishedByCategoryId(category.id())).thenReturn(List.of(post));
+        when(postRepository.findNewUnpublishedByCategoryId(category.id())).thenReturn(List.of(post));
         when(channelRepository.findByCategories_Id(category.id())).thenReturn(List.of(channel));
         when(publisherFactory.getPublisher(Platform.TELEGRAM)).thenReturn(publisher);
         PublishResult publishResult = new PublishResult();
@@ -90,7 +90,7 @@ class PublishingServiceTest {
         publishingService.publishPost(category);
 
         // Then
-        verify(postRepository, never()).findUnpublishedByCategoryId(any());
+        verify(postRepository, never()).findNewUnpublishedByCategoryId(any());
         verify(postRepository, never()).save(any());
     }
 
@@ -104,7 +104,7 @@ class PublishingServiceTest {
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("updatedAt").descending());
 
         when(postRepository.findPublishedByCategoryId(category.id(), pageRequest)).thenReturn(Collections.emptyList());
-        when(postRepository.findUnpublishedByCategoryId(category.id())).thenReturn(List.of(post));
+        when(postRepository.findNewUnpublishedByCategoryId(category.id())).thenReturn(List.of(post));
         when(channelRepository.findByCategories_Id(category.id())).thenReturn(Collections.emptyList());
 
         // When
@@ -121,7 +121,7 @@ class PublishingServiceTest {
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("updatedAt").descending());
 
         when(postRepository.findPublishedByCategoryId(category.id(), pageRequest)).thenReturn(Collections.emptyList());
-        when(postRepository.findUnpublishedByCategoryId(category.id())).thenReturn(Collections.emptyList());
+        when(postRepository.findNewUnpublishedByCategoryId(category.id())).thenReturn(Collections.emptyList());
 
         // When
         publishingService.publishPost(category);
@@ -147,7 +147,7 @@ class PublishingServiceTest {
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("updatedAt").descending());
 
         when(postRepository.findPublishedByCategoryId(category.id(), pageRequest)).thenReturn(Collections.emptyList());
-        when(postRepository.findUnpublishedByCategoryId(category.id())).thenReturn(List.of(post));
+        when(postRepository.findNewUnpublishedByCategoryId(category.id())).thenReturn(List.of(post));
         when(channelRepository.findByCategories_Id(category.id())).thenReturn(List.of(channel1, channel2));
         when(publisherFactory.getPublisher(Platform.TELEGRAM)).thenReturn(publisher);
         PublishResult publishResult = new PublishResult();
@@ -176,7 +176,7 @@ class PublishingServiceTest {
         PageRequest pageRequest = PageRequest.of(0, 1, Sort.by("updatedAt").descending());
 
         when(postRepository.findPublishedByCategoryId(category.id(), pageRequest)).thenReturn(Collections.emptyList());
-        when(postRepository.findUnpublishedByCategoryId(category.id())).thenReturn(List.of(post));
+        when(postRepository.findNewUnpublishedByCategoryId(category.id())).thenReturn(List.of(post));
         when(channelRepository.findByCategories_Id(category.id())).thenReturn(List.of(channel));
         when(publisherFactory.getPublisher(Platform.TELEGRAM)).thenReturn(publisher);
         when(publisher.publish(any(Post.class), any(Channel.class))).thenThrow(new RuntimeException("Test Exception"));
