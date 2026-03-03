@@ -5,3 +5,8 @@ spring:
     import: optional:configserver:http://localhost:8888
   profiles:
     active: dreader-micro, dreader-news, redis, kafka
+
+
+meta:
+  app-id: {META_APP_ID}
+  app-secret: {META_APP_SECRET}

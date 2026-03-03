@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dreader.dreadernews.dto.ChannelDto;
 import ru.dreader.dreadernews.entity.Channel;
+import ru.dreader.dreadernews.enums.Platform;
 import ru.dreader.dreadernews.mapper.ChannelMapper;
 import ru.dreader.dreadernews.repo.ChannelRepository;
 import ru.dreader.mvc.exception.ResourceNotFoundException;
@@ -24,6 +25,11 @@ public class ChannelService {
     @Transactional(readOnly = true)
     public List<ChannelDto> getAll() {
         return channelMapper.toDtoList(channelRepository.findAll());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Channel> getAllByPlatform(Platform platform) {
+        return channelRepository.findAllByPlatform(platform);
     }
 
     @Transactional(readOnly = true)

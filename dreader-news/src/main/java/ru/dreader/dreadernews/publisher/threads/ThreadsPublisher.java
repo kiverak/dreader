@@ -11,6 +11,7 @@ import ru.dreader.dreadernews.entity.PublishResult;
 import ru.dreader.dreadernews.enums.Platform;
 import ru.dreader.dreadernews.publisher.ChannelRateLimiter;
 import ru.dreader.dreadernews.publisher.Publisher;
+import ru.dreader.dreadernews.service.ThreadsTokenService;
 
 import java.time.Instant;
 import java.util.Map;
@@ -24,6 +25,7 @@ public class ThreadsPublisher implements Publisher {
 
     private final WebClient threadsWebClient;
     private final ChannelRateLimiter rateLimiter;
+    private final ThreadsTokenService tokenService;
 
     @Override
     public Platform getPlatform() {
@@ -32,34 +34,34 @@ public class ThreadsPublisher implements Publisher {
 
     @Override
     public PublishResult publish(Post post, Channel channel) {
-        String accessToken = channel.getCredentials().get("accessToken");
-        String userId = channel.getCredentials().get("userId");
+        String accessToken = tokenService.getValidToken(channel);
+        String clientId = channel.getCredentials().get("clientId");
 
-        if (accessToken == null || userId == null) {
+        if (accessToken == null || clientId == null) {
             return PublishResult.builder()
                     .success(false)
-                    .errorMessage("Missing accessToken or userId in channel credentials")
+                    .errorMessage("Missing accessToken or clientId in channel credentials")
                     .channel(channel)
                     .post(post)
                     .build();
         }
 
-        PublishResult result = sendWithRetry(post, accessToken, userId);
+        PublishResult result = sendWithRetry(post, accessToken, clientId);
         result.setChannel(channel);
         result.setPost(post);
 
         return result;
     }
 
-    private PublishResult sendWithRetry(Post post, String accessToken, String userId) {
+    private PublishResult sendWithRetry(Post post, String accessToken, String clientId) {
         int attempt = 0;
 
         while (attempt < MAX_ATTEMPTS) {
             attempt++;
 
             try {
-                rateLimiter.acquire(userId);
-                return send(post, accessToken, userId);
+                rateLimiter.acquire(clientId);
+                return send(post, accessToken, clientId);
 
             } catch (ThreadsRateLimitedException e) {
                 int retryAfter = e.retryAfterSeconds();
@@ -86,20 +88,15 @@ public class ThreadsPublisher implements Publisher {
                 .build();
     }
 
-    private PublishResult send(Post post, String accessToken, String userId) {
+    private PublishResult send(Post post, String accessToken, String clientId) {
         // TODO sendSinglePhoto, sendMediaGroup
-        return sendText(post, accessToken, userId);
+        return sendText(post, accessToken, clientId);
     }
 
-    private PublishResult sendText(Post post, String accessToken, String userId) {
-        String url = "/" + userId + "/threads";
+    private PublishResult sendText(Post post, String accessToken, String clientId) {
+        String url = "/" + clientId + "/threads";
 
-        Map<String, Object> payload = Map.of(
-                "text", post.getText(),
-                "access_token", accessToken
-        );
-
-        ThreadsResponse response = executeThreadsRequest(url, payload);
+        ThreadsResponse response = executeThreadsRequest(url, post, accessToken);
 
         if (Boolean.TRUE.equals(response.success())) {
             return PublishResult.builder()
@@ -112,11 +109,12 @@ public class ThreadsPublisher implements Publisher {
         throw buildExceptionFromResponse(response);
     }
 
-    private ThreadsResponse executeThreadsRequest(String url, Object payload) {
+    private ThreadsResponse executeThreadsRequest(String url, Post post, String token) {
         try {
             return threadsWebClient.post()
                     .uri(url)
-                    .bodyValue(payload)
+                    .header("Authorization", "Bearer " + token)
+                    .bodyValue(Map.of("text", post.getText()))
                     .retrieve()
                     .bodyToMono(ThreadsResponse.class)
                     .block();
