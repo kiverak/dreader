@@ -19,7 +19,7 @@ public class ThreadsToken {
     @Column(nullable = false, length = 500)
     private String accessToken;
 
-    @OneToOne(mappedBy = "threadsToken", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "channel_id", nullable = false)
     private Channel channel;
 
