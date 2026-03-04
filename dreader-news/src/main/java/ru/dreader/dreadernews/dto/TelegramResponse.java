@@ -1,4 +1,4 @@
-package ru.dreader.dreadernews.publisher.telegram;
+package ru.dreader.dreadernews.dto;
 
 public record TelegramResponse(
         boolean ok,

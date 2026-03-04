@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import ru.dreader.dreadernews.dto.TelegramResponse;
 import ru.dreader.dreadernews.entity.Channel;
 import ru.dreader.dreadernews.entity.Post;
 import ru.dreader.dreadernews.entity.PostMedia;
