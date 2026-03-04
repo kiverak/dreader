@@ -1,0 +1,2 @@
+ALTER TABLE threads_token
+    ADD COLUMN user_id BIGINT NOT NULL DEFAULT 0;

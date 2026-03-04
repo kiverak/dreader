@@ -19,6 +19,9 @@ public class ThreadsToken {
     @Column(nullable = false, length = 500)
     private String accessToken;
 
+    @Column(nullable = false)
+    private Long userId;
+
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "channel_id", nullable = false)
     private Channel channel;

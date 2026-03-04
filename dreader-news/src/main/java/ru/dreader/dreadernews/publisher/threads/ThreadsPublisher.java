@@ -2,19 +2,25 @@ package ru.dreader.dreadernews.publisher.threads;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
+import ru.dreader.dreadernews.dto.ThreadsCreateContainerRequest;
+import ru.dreader.dreadernews.dto.ThreadsCreateContainerResponse;
+import ru.dreader.dreadernews.dto.ThreadsPostResponse;
+import ru.dreader.dreadernews.dto.ThreadsPublishRequest;
 import ru.dreader.dreadernews.entity.Channel;
 import ru.dreader.dreadernews.entity.Post;
 import ru.dreader.dreadernews.entity.PublishResult;
+import ru.dreader.dreadernews.entity.ThreadsToken;
 import ru.dreader.dreadernews.enums.Platform;
 import ru.dreader.dreadernews.publisher.ChannelRateLimiter;
 import ru.dreader.dreadernews.publisher.Publisher;
 import ru.dreader.dreadernews.service.ThreadsTokenService;
 
 import java.time.Instant;
-import java.util.Map;
 
 @Log4j2
 @Service
@@ -34,7 +40,7 @@ public class ThreadsPublisher implements Publisher {
 
     @Override
     public PublishResult publish(Post post, Channel channel) {
-        String accessToken = tokenService.getValidToken(channel);
+        ThreadsToken accessToken = tokenService.getValidToken(channel);
         String clientId = channel.getCredentials().get("clientId");
 
         if (accessToken == null || clientId == null) {
@@ -56,7 +62,7 @@ public class ThreadsPublisher implements Publisher {
         return result;
     }
 
-    private PublishResult sendWithRetry(Post post, String accessToken, String clientId) {
+    private PublishResult sendWithRetry(Post post, ThreadsToken accessToken, String clientId) {
         int attempt = 0;
 
         while (attempt < MAX_ATTEMPTS) {
@@ -64,8 +70,7 @@ public class ThreadsPublisher implements Publisher {
 
             try {
                 rateLimiter.acquire(clientId);
-                return send(post, accessToken, clientId);
-
+                return send(post, accessToken);
             } catch (ThreadsRateLimitedException e) {
                 int retryAfter = e.retryAfterSeconds();
                 log.warn("Threads rate limited. Retry after {} seconds", retryAfter);
@@ -91,57 +96,141 @@ public class ThreadsPublisher implements Publisher {
                 .build();
     }
 
-    private PublishResult send(Post post, String accessToken, String clientId) {
+    private PublishResult send(Post post, ThreadsToken accessToken) {
         // TODO sendSinglePhoto, sendMediaGroup
-        return sendText(post, accessToken, clientId);
+        return sendText(post, accessToken);
     }
 
-    private PublishResult sendText(Post post, String accessToken, String clientId) {
-        String url = "/v1.0/" + clientId + "/threads";
+    private PublishResult sendText(Post post, ThreadsToken accessToken) {
 
-        ThreadsResponse response = executeThreadsRequest(url, post, accessToken);
+        ThreadsCreateContainerResponse container = createContainer(post, accessToken);
+        ThreadsPostResponse postResponse = publishPost(container, accessToken);
 
-        if (Boolean.TRUE.equals(response.success())) {
+        if (postResponse.id() != null) {
             return PublishResult.builder()
                     .success(true)
                     .publishedAt(Instant.now())
-                    .externalId(response.id()) // Threads returns post ID
+                    .externalId(postResponse.id()) // Threads returns post ID
                     .build();
         }
 
-        throw buildExceptionFromResponse(response);
+        throw new RuntimeException("Failed to publish post" + post.getId() + " to Threads");
     }
 
-    private ThreadsResponse executeThreadsRequest(String url, Post post, String token) {
-        try {
-            return threadsWebClient.post()
-                    .uri(url)
-                    .header("Authorization", "Bearer " + token)
-                    .bodyValue(Map.of("text", post.getText()))
-                    .retrieve()
-                    .bodyToMono(ThreadsResponse.class)
-                    .block();
-        } catch (WebClientResponseException e) {
-            throw new RuntimeException("Threads HTTP error: " + e.getStatusCode().value() + " " + e.getResponseBodyAsString(), e);
-        } catch (Exception e) {
-            throw new RuntimeException("Threads I/O error: " + e.getMessage(), e);
-        }
+    private ThreadsCreateContainerResponse createContainer(Post post, ThreadsToken accessToken) {
+        ThreadsCreateContainerRequest createRequest =
+                new ThreadsCreateContainerRequest(post.getText(), accessToken.getAccessToken());
+
+        return threadsWebClient.post()
+                .uri("/v1.0/{user_id}/threads", accessToken.getUserId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(createRequest)
+                .retrieve()
+
+                // --- RATE LIMIT: HTTP 429 ---
+                .onStatus(status -> status.value() == 429, response ->
+                        response.headers().asHttpHeaders().containsKey("Retry-After")
+                                ? response.bodyToMono(String.class).flatMap(body -> {
+                            int retryAfter = Integer.parseInt(
+                                    response.headers().asHttpHeaders().getFirst("Retry-After")
+                            );
+                            log.warn("Threads rate limited (429). Retry after {} seconds. Body: {}", retryAfter, body);
+                            return Mono.error(new ThreadsRateLimitedException("Rate limited", retryAfter));
+                        })
+                                : response.bodyToMono(String.class).flatMap(body -> {
+                            log.warn("Threads rate limited (429, no Retry-After). Body: {}", body);
+                            return Mono.error(new ThreadsRateLimitedException("Rate limited", 1));
+                        })
+                )
+
+                // --- RATE LIMIT: ERROR CODE 613 ---
+                .onStatus(HttpStatusCode::is4xxClientError, response ->
+                        response.bodyToMono(String.class).flatMap(body -> {
+                            if (body.contains("\"code\":613")) {
+                                log.warn("Threads rate limited (code 613). Body: {}", body);
+                                return Mono.error(new ThreadsRateLimitedException("Rate limited (613)", 1));
+                            }
+                            log.error("Threads 4xx error while creating container: {}", body);
+                            return Mono.error(new RuntimeException("Threads 4xx error: " + body));
+                        })
+                )
+
+                .onStatus(HttpStatusCode::is4xxClientError, response ->
+                        response.bodyToMono(String.class).flatMap(body -> {
+                            log.error("Threads 4xx error while creating container: {}", body);
+                            return Mono.error(new RuntimeException("Threads 4xx error: " + body));
+                        })
+                )
+
+                // --- TRANSIENT ERRORS: 5xx ---
+                .onStatus(HttpStatusCode::is5xxServerError, response ->
+                        response.bodyToMono(String.class).flatMap(body -> {
+                            log.error("Threads 5xx error while creating container: {}", body);
+                            return Mono.error(new TransientThreadsException("Threads 5xx error: " + body));
+                        })
+                )
+
+                .bodyToMono(ThreadsCreateContainerResponse.class)
+                .blockOptional()
+                .orElseThrow(() -> new IllegalStateException("Threads returned empty container response"));
     }
 
-    private RuntimeException buildExceptionFromResponse(ThreadsResponse response) {
-        int code = response.error_code() != null ? response.error_code() : 0;
-        String desc = response.error() != null ? response.error() : "Unknown Threads error";
+    private ThreadsPostResponse publishPost(ThreadsCreateContainerResponse container, ThreadsToken accessToken) {
+        ThreadsPublishRequest publishRequest =
+                new ThreadsPublishRequest(container.id(), accessToken.getAccessToken());
 
-        if (code == 429) {
-            int retryAfter = response.retry_after() != null ? response.retry_after() : 0;
-            return new ThreadsRateLimitedException(desc, retryAfter);
-        }
+        return threadsWebClient.post()
+                .uri("/v1.0/{user_id}/threads_publish", accessToken.getUserId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(publishRequest)
+                .retrieve()
 
-        if (code >= 500 && code <= 504) {
-            return new TransientThreadsException(desc);
-        }
+                // --- RATE LIMIT: HTTP 429 ---
+                .onStatus(status -> status.value() == 429, response ->
+                        response.headers().asHttpHeaders().containsKey("Retry-After")
+                                ? response.bodyToMono(String.class).flatMap(body -> {
+                            int retryAfter = Integer.parseInt(
+                                    response.headers().asHttpHeaders().getFirst("Retry-After")
+                            );
+                            log.warn("Threads rate limited (429). Retry after {} seconds. Body: {}", retryAfter, body);
+                            return Mono.error(new ThreadsRateLimitedException("Rate limited", retryAfter));
+                        })
+                                : response.bodyToMono(String.class).flatMap(body -> {
+                            log.warn("Threads rate limited (429, no Retry-After). Body: {}", body);
+                            return Mono.error(new ThreadsRateLimitedException("Rate limited", 1));
+                        })
+                )
 
-        return new RuntimeException("Threads error " + code + ": " + desc);
+                // --- RATE LIMIT: ERROR CODE 613 ---
+                .onStatus(HttpStatusCode::is4xxClientError, response ->
+                        response.bodyToMono(String.class).flatMap(body -> {
+                            if (body.contains("\"code\":613")) {
+                                log.warn("Threads rate limited (code 613). Body: {}", body);
+                                return Mono.error(new ThreadsRateLimitedException("Rate limited (613)", 1));
+                            }
+                            log.error("Threads 4xx error while publishing post: {}", body);
+                            return Mono.error(new RuntimeException("Threads 4xx error: " + body));
+                        })
+                )
+
+                .onStatus(HttpStatusCode::is4xxClientError, response ->
+                        response.bodyToMono(String.class).flatMap(body -> {
+                            log.error("Threads 4xx error while publishing post: {}", body);
+                            return Mono.error(new RuntimeException("Threads 4xx error: " + body));
+                        })
+                )
+
+                // --- TRANSIENT ERRORS: 5xx ---
+                .onStatus(HttpStatusCode::is5xxServerError, response ->
+                        response.bodyToMono(String.class).flatMap(body -> {
+                            log.error("Threads 5xx error while publishing post: {}", body);
+                            return Mono.error(new TransientThreadsException("Threads 5xx error: " + body));
+                        })
+                )
+
+                .bodyToMono(ThreadsPostResponse.class)
+                .blockOptional()
+                .orElseThrow(() -> new IllegalStateException("Threads returned empty publish response"));
     }
 
     private void sleepSeconds(int seconds) {

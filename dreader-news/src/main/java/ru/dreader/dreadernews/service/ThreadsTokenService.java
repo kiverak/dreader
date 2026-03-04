@@ -56,6 +56,7 @@ public class ThreadsTokenService {
         }
 
         entity.setAccessToken(longToken.access_token());
+        entity.setUserId(shortToken.user_id());
         entity.setExpiresAt(Instant.now().plusSeconds(longToken.expires_in()));
 
         repo.save(entity);
@@ -119,9 +120,8 @@ public class ThreadsTokenService {
     }
 
     @Transactional
-    public String getValidToken(Channel channel) {
+    public ThreadsToken getValidToken(Channel channel) {
         return repo.findByChannel(channel)
-                .map(ThreadsToken::getAccessToken)
                 .orElseThrow(() -> new IllegalStateException("Threads token not initialized for channel id " + channel.getId()));
     }
 
