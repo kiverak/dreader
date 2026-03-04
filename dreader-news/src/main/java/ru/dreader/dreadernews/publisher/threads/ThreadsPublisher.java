@@ -49,6 +49,9 @@ public class ThreadsPublisher implements Publisher {
         PublishResult result = sendWithRetry(post, accessToken, clientId);
         result.setChannel(channel);
         result.setPost(post);
+        Instant now = Instant.now();
+        result.setCreatedAt(now);
+        result.setUpdatedAt(now);
 
         return result;
     }

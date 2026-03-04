@@ -1,6 +1,5 @@
 package ru.dreader.dreadernews.job;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,16 +19,11 @@ public class ThreadsAuthRefresher {
     private final ThreadsTokenService tokenService;
     private final ChannelService channelService;
 
-    @PostConstruct
-    public void init() {
-        refresh();
-    }
-
     @Scheduled(fixedDelay = 24 * 60 * 60 * 1000) // once a day
     public void scheduledRefresh() {
         refresh();
     }
-    
+
     private void refresh() {
         List<Channel> channels = channelService.getAllByPlatform(Platform.THREADS);
         for (Channel ch : channels) {

@@ -93,7 +93,7 @@ public class ThreadsTokenService {
         ThreadsToken entity = repo.findByChannel(channel).orElse(null);
         if (entity == null) return;
 
-        if (entity.getExpiresAt().isBefore(Instant.now().plus(Duration.ofDays(2)))) {
+        if (entity.getExpiresAt().isBefore(Instant.now().plus(Duration.ofDays(60)))) {
             ThreadsLongLivedTokenResponse refreshed = refreshLongLived(entity.getAccessToken());
 
             entity.setAccessToken(refreshed.access_token());
