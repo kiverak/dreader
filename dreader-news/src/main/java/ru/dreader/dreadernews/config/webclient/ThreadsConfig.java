@@ -30,7 +30,7 @@ public class ThreadsConfig extends BaseWebClientConfig {
 
         return WebClient.builder()
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .baseUrl("https://graph.threads.net/v1.0")
+                .baseUrl("https://graph.threads.net")
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .filter(retryFilter(cfg))
                 .build();
@@ -46,7 +46,7 @@ public class ThreadsConfig extends BaseWebClientConfig {
 
         return WebClient.builder()
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .baseUrl("https://graph.threads.net/v1.0")
+                .baseUrl("https://graph.threads.net")
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .filter(retryFilter(cfg))
                 .build();

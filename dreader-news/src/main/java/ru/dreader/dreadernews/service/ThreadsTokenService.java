@@ -2,8 +2,10 @@ package ru.dreader.dreadernews.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.dreader.dreadernews.dto.ThreadsCodeShortLivedTokenRequest;
 import ru.dreader.dreadernews.dto.ThreadsLongLivedTokenResponse;
@@ -73,15 +75,14 @@ public class ThreadsTokenService {
     }
 
     private ThreadsShortLivedTokenResponse requestShortLivedToken(ThreadsCodeShortLivedTokenRequest request) {
-        return threadsWebClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/access_token")
-                        .queryParam("client_id", appId)
-                        .queryParam("client_secret", appSecret)
-                        .queryParam("grant_type", "authorization_code")
-                        .queryParam("redirect_uri", "https://localhost:8080/meta/callback")
-                        .queryParam("code", request.code())
-                        .build())
+        return threadsWebClient.post()
+                .uri("/oauth/access_token")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters.fromFormData("client_id", appId)
+                        .with("client_secret", appSecret)
+                        .with("grant_type", "authorization_code")
+                        .with("redirect_uri", "https://localhost:8080/meta/callback")
+                        .with("code", request.code()))
                 .retrieve()
                 .bodyToMono(ThreadsShortLivedTokenResponse.class)
                 .block();

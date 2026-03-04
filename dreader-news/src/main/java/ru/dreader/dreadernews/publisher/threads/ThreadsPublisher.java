@@ -94,7 +94,7 @@ public class ThreadsPublisher implements Publisher {
     }
 
     private PublishResult sendText(Post post, String accessToken, String clientId) {
-        String url = "/" + clientId + "/threads";
+        String url = "/v1.0/" + clientId + "/threads";
 
         ThreadsResponse response = executeThreadsRequest(url, post, accessToken);
 
