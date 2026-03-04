@@ -118,8 +118,9 @@ public class ThreadsPublisher implements Publisher {
     }
 
     private ThreadsCreateContainerResponse createContainer(Post post, ThreadsToken accessToken, String mediaType) {
+        String text = post.getText().substring(0, 500);
         ThreadsCreateContainerRequest createRequest =
-                new ThreadsCreateContainerRequest(post.getText(), accessToken.getAccessToken(), mediaType);
+                new ThreadsCreateContainerRequest(text, mediaType, accessToken.getAccessToken());
 
         return threadsWebClient.post()
                 .uri("/v1.0/{user_id}/threads", accessToken.getUserId())
