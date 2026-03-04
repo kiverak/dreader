@@ -56,6 +56,7 @@ public class ThreadsPublisher implements Publisher {
         result.setChannel(channel);
         result.setPost(post);
         Instant now = Instant.now();
+        result.setPublishedAt(now);
         result.setCreatedAt(now);
         result.setUpdatedAt(now);
 
@@ -102,8 +103,7 @@ public class ThreadsPublisher implements Publisher {
     }
 
     private PublishResult sendText(Post post, ThreadsToken accessToken) {
-
-        ThreadsCreateContainerResponse container = createContainer(post, accessToken);
+        ThreadsCreateContainerResponse container = createContainer(post, accessToken, "TEXT");
         ThreadsPostResponse postResponse = publishPost(container, accessToken);
 
         if (postResponse.id() != null) {
@@ -117,9 +117,9 @@ public class ThreadsPublisher implements Publisher {
         throw new RuntimeException("Failed to publish post" + post.getId() + " to Threads");
     }
 
-    private ThreadsCreateContainerResponse createContainer(Post post, ThreadsToken accessToken) {
+    private ThreadsCreateContainerResponse createContainer(Post post, ThreadsToken accessToken, String mediaType) {
         ThreadsCreateContainerRequest createRequest =
-                new ThreadsCreateContainerRequest(post.getText(), accessToken.getAccessToken());
+                new ThreadsCreateContainerRequest(post.getText(), accessToken.getAccessToken(), mediaType);
 
         return threadsWebClient.post()
                 .uri("/v1.0/{user_id}/threads", accessToken.getUserId())
