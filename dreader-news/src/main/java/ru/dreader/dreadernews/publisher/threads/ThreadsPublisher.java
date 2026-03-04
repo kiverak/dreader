@@ -118,7 +118,7 @@ public class ThreadsPublisher implements Publisher {
     }
 
     private ThreadsCreateContainerResponse createContainer(Post post, ThreadsToken accessToken, String mediaType) {
-        String text = post.getText().substring(0, 500);
+        String text = post.getText().substring(0, 500); // TODO remake text building
         ThreadsCreateContainerRequest createRequest =
                 new ThreadsCreateContainerRequest(text, mediaType, accessToken.getAccessToken());
 
