@@ -34,7 +34,6 @@ public class PublishingService {
 
     @Async("asyncExecutor")
     @CacheEvict(value = "publishedPosts", allEntries = true)
-    @Transactional
     public void publishPost(CategoryDto category) {
         // находим стратегию для категории // TODO
         int minUpdatePeriodInMinutes = 30;
@@ -110,6 +109,9 @@ public class PublishingService {
     public void publish(Post post, Channel channel) {
         Publisher publisher = publisherFactory.getPublisher(channel.getPlatform());
         PublishResult result = publisher.publish(post, channel);
+        Instant now = Instant.now();
+        result.setCreatedAt(now);
+        result.setUpdatedAt(now);
         publishResultService.save(result);
 
         if (result.isSuccess()) {
