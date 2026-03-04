@@ -1,12 +1,13 @@
 package ru.dreader.dreadernews.service;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import ru.dreader.dreadernews.dto.ThreadsCodeShortLivedTokenRequest;
 import ru.dreader.dreadernews.dto.ThreadsLongLivedTokenResponse;
-import ru.dreader.dreadernews.dto.ThreadsShortLivedTokenRequest;
+import ru.dreader.dreadernews.dto.ThreadsShortLivedTokenResponse;
 import ru.dreader.dreadernews.entity.Channel;
 import ru.dreader.dreadernews.entity.ThreadsToken;
 import ru.dreader.dreadernews.repo.ChannelRepository;
@@ -17,48 +18,31 @@ import java.time.Instant;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class ThreadsTokenService {
 
-    @Value("${meta.app-id}")
+    @Value("${threads.app-id}")
     private String appId;
 
-    @Value("${meta.app-secret}")
+    @Value("${threads.app-secret}")
     private String appSecret;
 
     private final ThreadsTokenRepository repo;
     private final ChannelRepository channelRepository;
+
+    @Qualifier("threadsWebClient")
     private final WebClient threadsWebClient;
 
-    public ThreadsLongLivedTokenResponse exchangeForLongLived(String shortLivedToken) {
-        return threadsWebClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/access_token")
-                        .queryParam("grant_type", "th_exchange_token")
-                        .queryParam("client_secret", appSecret)
-                        .queryParam("access_token", shortLivedToken)
-                        .build())
-                .retrieve()
-                .bodyToMono(ThreadsLongLivedTokenResponse.class)
-                .block();
-    }
-
-    public ThreadsLongLivedTokenResponse refreshLongLived(String longLivedToken) {
-        return threadsWebClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/refresh_access_token")
-                        .queryParam("grant_type", "th_refresh_token")
-                        .queryParam("access_token", longLivedToken)
-                        .build())
-                .retrieve()
-                .bodyToMono(ThreadsLongLivedTokenResponse.class)
-                .block();
+    public ThreadsTokenService(ThreadsTokenRepository repo, ChannelRepository channelRepository, WebClient threadsWebClient) {
+        this.repo = repo;
+        this.channelRepository = channelRepository;
+        this.threadsWebClient = threadsWebClient;
     }
 
     @Transactional
-    public synchronized void saveShortLivedToken(ThreadsShortLivedTokenRequest request) {
+    public synchronized void requestAndSaveLongLivedToken(ThreadsCodeShortLivedTokenRequest request) {
         Channel channel = channelRepository.findById(request.channelId()).orElseThrow(() -> new IllegalStateException("Channel not found"));
-        ThreadsLongLivedTokenResponse longToken = exchangeForLongLived(request.token());
+        ThreadsShortLivedTokenResponse shortToken = requestShortLivedToken(request);
+        ThreadsLongLivedTokenResponse longToken = exchangeForLongLived(shortToken.access_token());
 
         Optional<ThreadsToken> existing = repo.findById(request.channelId());
         ThreadsToken entity;
@@ -73,6 +57,34 @@ public class ThreadsTokenService {
         entity.setExpiresAt(Instant.now().plusSeconds(longToken.expires_in()));
 
         repo.save(entity);
+    }
+
+    private ThreadsLongLivedTokenResponse exchangeForLongLived(String shortLivedToken) {
+        return threadsWebClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/access_token")
+                        .queryParam("grant_type", "th_exchange_token")
+                        .queryParam("client_secret", appSecret)
+                        .queryParam("access_token", shortLivedToken)
+                        .build())
+                .retrieve()
+                .bodyToMono(ThreadsLongLivedTokenResponse.class)
+                .block();
+    }
+
+    private ThreadsShortLivedTokenResponse requestShortLivedToken(ThreadsCodeShortLivedTokenRequest request) {
+        return threadsWebClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/access_token")
+                        .queryParam("client_id", appId)
+                        .queryParam("client_secret", appSecret)
+                        .queryParam("grant_type", "authorization_code")
+                        .queryParam("redirect_uri", "https://localhost:8080/meta/callback")
+                        .queryParam("code", request.code())
+                        .build())
+                .retrieve()
+                .bodyToMono(ThreadsShortLivedTokenResponse.class)
+                .block();
     }
 
     @Transactional
@@ -90,7 +102,19 @@ public class ThreadsTokenService {
             return;
         }
 
-        throw new RuntimeException("Token for channel id" + channel.getId() + " is expired, please refresh");
+        throw new RuntimeException("Token for channel id" + channel.getId() + " is expired, please refresh with new code");
+    }
+
+    private ThreadsLongLivedTokenResponse refreshLongLived(String longLivedToken) {
+        return threadsWebClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/refresh_access_token")
+                        .queryParam("grant_type", "th_refresh_token")
+                        .queryParam("access_token", longLivedToken)
+                        .build())
+                .retrieve()
+                .bodyToMono(ThreadsLongLivedTokenResponse.class)
+                .block();
     }
 
     @Transactional

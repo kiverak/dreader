@@ -1,6 +1,7 @@
 package ru.dreader.dreadernews.config.webclient;
 
 import jakarta.ws.rs.core.HttpHeaders;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -13,8 +14,9 @@ import reactor.netty.transport.ProxyProvider;
 @Configuration
 public class ThreadsConfig extends BaseWebClientConfig {
 
-    @Bean
+    @Bean(name = "threadsWebClient")
     @Profile("local")
+    @Qualifier("threadsWebClient")
     public WebClient threadsWebClientLocal(WebClientProperties props) {
         var cfg = cfg(props, "threads-client");
 
@@ -34,8 +36,9 @@ public class ThreadsConfig extends BaseWebClientConfig {
                 .build();
     }
 
-    @Bean
+    @Bean(name = "threadsWebClient")
     @Profile("!local")
+    @Qualifier("threadsWebClient")
     public WebClient threadsWebClient(WebClientProperties props) {
         var cfg = cfg(props, "threads-client");
 

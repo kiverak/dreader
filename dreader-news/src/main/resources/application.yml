@@ -7,6 +7,6 @@ spring:
     active: dreader-micro, dreader-news, redis, kafka
 
 
-meta:
-  app-id: {META_APP_ID}
-  app-secret: {META_APP_SECRET}
+threads:
+  app-id: {THREADS_APP_ID}
+  app-secret: {THREADS_APP_SECRET}
