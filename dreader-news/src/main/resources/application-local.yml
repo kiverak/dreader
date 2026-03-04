@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: dreader-news
+  config:
+    import: optional:configserver:http://localhost:8888
+
+threads:
+  app-id: {THREADS_APP_ID}
+  app-secret: {THREADS_APP_SECRET}
