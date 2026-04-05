@@ -22,7 +22,8 @@ public class OldEntityCleaner {
     private final ProcessedArticleService processedArticleService;
 
 //    @Scheduled(fixedRate = 1000 * 60 * 60 * 24)
-    @Scheduled(cron = "0 0 3 * * *") // every day at 03:00
+    @Scheduled(fixedRate = 1000 * 60)
+//    @Scheduled(cron = "0 0 3 * * *") // every day at 03:00
     @SchedulerLock(name = "cleanOldEntities", lockAtMostFor = "20m", lockAtLeastFor = "1m")
     public void cleanOldEntities() {
         log.info("Entity cleaning scheduler started...");

@@ -1,6 +1,5 @@
 package ru.dreader.dreadernews.config;
 
-import dto.ArticleDto;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
