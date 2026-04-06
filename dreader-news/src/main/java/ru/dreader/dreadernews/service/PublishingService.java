@@ -110,6 +110,7 @@ public class PublishingService {
         Publisher publisher = publisherFactory.getPublisher(channel.getPlatform());
         PublishResult result = publisher.publish(post, channel);
         Instant now = Instant.now();
+        result.setPublishedAt(now);
         result.setCreatedAt(now);
         result.setUpdatedAt(now);
         publishResultService.save(result);

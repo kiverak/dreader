@@ -91,16 +91,16 @@ public class ThreadsTokenService {
 
     @Transactional
     public synchronized void refreshIfNeeded(Channel channel) {
-        ThreadsToken entity = repo.findByChannel(channel).orElse(null);
-        if (entity == null) return;
+        ThreadsToken token = repo.findByChannel(channel).orElse(null);
+        if (token == null) return;
 
-        if (entity.getExpiresAt().isBefore(Instant.now().plus(Duration.ofDays(60)))) {
-            ThreadsLongLivedTokenResponse refreshed = refreshLongLived(entity.getAccessToken());
+        if (token.getExpiresAt().isBefore(Instant.now().plus(Duration.ofDays(60)))) {
+            ThreadsLongLivedTokenResponse refreshed = refreshLongLived(token.getAccessToken());
 
-            entity.setAccessToken(refreshed.access_token());
-            entity.setExpiresAt(Instant.now().plusSeconds(refreshed.expires_in()));
+            token.setAccessToken(refreshed.access_token());
+            token.setExpiresAt(Instant.now().plusSeconds(refreshed.expires_in()));
 
-            repo.save(entity);
+            repo.save(token);
             return;
         }
 
