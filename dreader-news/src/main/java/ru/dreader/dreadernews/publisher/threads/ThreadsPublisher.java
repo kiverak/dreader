@@ -1,7 +1,7 @@
 package ru.dreader.dreadernews.publisher.threads;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
@@ -29,14 +29,21 @@ import java.time.Instant;
 
 @Log4j2
 @Service
-@RequiredArgsConstructor
 public class ThreadsPublisher implements Publisher {
 
     private static final int MAX_ATTEMPTS = 3;
 
+    @Qualifier("threadsRestClient")
     private final RestClient threadsRestClient;
+
     private final ChannelRateLimiter rateLimiter;
     private final ThreadsTokenService tokenService;
+
+    public ThreadsPublisher(RestClient threadsRestClient, ChannelRateLimiter rateLimiter, ThreadsTokenService tokenService) {
+        this.threadsRestClient = threadsRestClient;
+        this.rateLimiter = rateLimiter;
+        this.tokenService = tokenService;
+    }
 
     @Override
     public Platform getPlatform() {
