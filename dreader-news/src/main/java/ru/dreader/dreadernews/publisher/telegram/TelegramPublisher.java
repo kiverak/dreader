@@ -10,6 +10,8 @@ import ru.dreader.dreadernews.entity.Post;
 import ru.dreader.dreadernews.entity.PostMedia;
 import ru.dreader.dreadernews.entity.PublishResult;
 import ru.dreader.dreadernews.enums.Platform;
+import ru.dreader.dreadernews.exceptions.TelegramRateLimitedException;
+import ru.dreader.dreadernews.exceptions.TransientTelegramException;
 import ru.dreader.dreadernews.publisher.ChannelRateLimiter;
 import ru.dreader.dreadernews.publisher.Publisher;
 
@@ -222,26 +224,5 @@ public class TelegramPublisher implements Publisher {
     private int backoffSeconds(int attempt) {
         // flat exponential backoff: 1, 2, 4
         return (int) Math.pow(2, attempt - 1);
-    }
-
-    // --- Custom exceptions ---
-
-    private static class TelegramRateLimitedException extends RuntimeException {
-        private final int retryAfterSeconds;
-
-        TelegramRateLimitedException(String message, int retryAfterSeconds) {
-            super(message);
-            this.retryAfterSeconds = retryAfterSeconds;
-        }
-
-        int retryAfterSeconds() {
-            return retryAfterSeconds;
-        }
-    }
-
-    private static class TransientTelegramException extends RuntimeException {
-        TransientTelegramException(String message) {
-            super(message);
-        }
     }
 }
