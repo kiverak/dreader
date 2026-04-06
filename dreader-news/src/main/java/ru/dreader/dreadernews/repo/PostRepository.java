@@ -43,7 +43,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             JOIN FETCH p.categories c
             LEFT JOIN FETCH p.media m
             WHERE c.id = :categoryId
-              AND p.status = 'PENDING'
+              AND (p.status = 'PENDING' OR p.status = 'FAILED')
               AND p.createdAt >= CURRENT_TIMESTAMP - 1 DAY
             """)
     List<Post> findNewUnpublishedByCategoryId(Long categoryId);
