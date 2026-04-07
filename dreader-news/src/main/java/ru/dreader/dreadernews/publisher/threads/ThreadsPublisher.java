@@ -1,5 +1,7 @@
 package ru.dreader.dreadernews.publisher.threads;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
@@ -26,6 +28,11 @@ import ru.dreader.dreadernews.service.ThreadsTokenService;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -38,11 +45,13 @@ public class ThreadsPublisher implements Publisher {
 
     private final ChannelRateLimiter rateLimiter;
     private final ThreadsTokenService tokenService;
+    private final ObjectMapper objectMapper;
 
-    public ThreadsPublisher(RestClient threadsRestClient, ChannelRateLimiter rateLimiter, ThreadsTokenService tokenService) {
+    public ThreadsPublisher(RestClient threadsRestClient, ChannelRateLimiter rateLimiter, ThreadsTokenService tokenService, ObjectMapper objectMapper) {
         this.threadsRestClient = threadsRestClient;
         this.rateLimiter = rateLimiter;
         this.tokenService = tokenService;
+        this.objectMapper = new ObjectMapper();;
     }
 
     @Override
@@ -130,13 +139,7 @@ public class ThreadsPublisher implements Publisher {
     }
 
     private ThreadsCreateContainerResponse createContainer(Post post, ThreadsToken accessToken, String mediaType) {
-
-        String text = post.getText().substring(0, Math.min(post.getText().length(), 500)); // TODO remake text building
-
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("text", text);
-        formData.add("media_type", mediaType);
-        formData.add("access_token", accessToken.getAccessToken());
+        MultiValueMap<String, String> formData = buildFormData(post, accessToken, mediaType);
 
         return threadsRestClient.post()
                 .uri("/v1.0/{user_id}/threads", accessToken.getUserId())
@@ -252,4 +255,65 @@ public class ThreadsPublisher implements Publisher {
     private int backoffSeconds(int attempt) {
         return (int) Math.pow(2, attempt - 1);
     }
+
+    // Construct text from title, summary and bullets
+    private MultiValueMap<String, String> buildFormData(Post post, ThreadsToken accessToken, String mediaType) {
+        // Короткий текст, который будет виден в ленте (до 500 символов)
+        String shortText = post.getSourceName() + ": " + post.getSummary();
+
+        // Полный текст для text_attachment (до 10 000 символов)
+        String fullText = post.getSourceName() + ": " + post.getSummary() + "\n\n" + post.getText();
+
+        if (fullText.length() > 10000) {
+            log.warn("fullText is too long for Threads (10000 symbols). Cut off to 10000.");
+            fullText = fullText.substring(0, 10000);
+        }
+
+        // Подготавливаем styling: делаем жирным "Источник: "
+        List<TextStylingRange> stylingRanges = new ArrayList<>();
+
+        int boldLength = post.getSourceName().length() + 2; // + ": "
+        stylingRanges.add(new TextStylingRange(0, boldLength, List.of("bold")));
+
+        // for safety
+        if (fullText.length() < (post.getSourceName().length() + 2 + post.getSummary().length() + 2)) {
+            stylingRanges.clear();
+        }
+
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("media_type", mediaType);
+        formData.add("text", shortText);
+        formData.add("access_token", accessToken.getAccessToken());
+
+        String textAttachmentJson = buildTextAttachmentJson(fullText, stylingRanges, post.getUrl());
+        formData.add("text_attachment", textAttachmentJson);
+
+        return formData;
+    }
+
+    /**
+     * Create JSON для text_attachment
+     */
+    private String buildTextAttachmentJson(String plaintext,
+                                           List<TextStylingRange> stylingRanges,
+                                           String linkUrl) {
+        try {
+            Map<String, Object> attachment = new LinkedHashMap<>(); // save fields order
+            attachment.put("plaintext", plaintext);
+
+            if (linkUrl != null && !linkUrl.isBlank()) {
+                attachment.put("link_attachment_url", linkUrl);
+            }
+
+            if (stylingRanges != null && !stylingRanges.isEmpty()) {
+                attachment.put("text_with_styling_info", stylingRanges);
+            }
+
+            return objectMapper.writeValueAsString(attachment);
+        } catch (JsonProcessingException e) {
+            log.error("Serialization text_attachment error for Threads", e);
+            throw new RuntimeException("Couldn't create text_attachment JSON", e);
+        }
+    }
+
 }

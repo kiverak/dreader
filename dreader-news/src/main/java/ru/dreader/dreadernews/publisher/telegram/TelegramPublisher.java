@@ -96,9 +96,11 @@ public class TelegramPublisher implements Publisher {
     private PublishResult sendText(Post post, String botToken, String chatId) {
         String url = TELEGRAM_API_BASE + botToken + "/sendMessage";
 
+        String text = buildText(post);
+
         Map<String, Object> payload = Map.of(
                 "chat_id", chatId,
-                "text", post.getText(),
+                "text", text,
                 "parse_mode", "HTML",
                 "disable_web_page_preview", true
         );
@@ -121,10 +123,12 @@ public class TelegramPublisher implements Publisher {
     private PublishResult sendSinglePhoto(Post post, PostMedia media, String botToken, String chatId) {
         String url = TELEGRAM_API_BASE + botToken + "/sendPhoto";
 
+        String text = buildText(post);
+
         Map<String, Object> payload = Map.of(
                 "chat_id", chatId,
                 "photo", media.getUrl(),
-                "caption", post.getText(),
+                "caption", text,
                 "parse_mode", "HTML"
         );
 
@@ -146,6 +150,8 @@ public class TelegramPublisher implements Publisher {
     private PublishResult sendMediaGroup(Post post, List<PostMedia> media, String botToken, String chatId) {
         String url = TELEGRAM_API_BASE + botToken + "/sendMediaGroup";
 
+        String text = buildText(post);
+
         List<Map<String, Object>> items = new ArrayList<>();
         for (int i = 0; i < media.size(); i++) {
             PostMedia m = media.get(i);
@@ -153,7 +159,7 @@ public class TelegramPublisher implements Publisher {
             item.put("type", "photo");
             item.put("media", m.getUrl());
             if (i == 0 && post.getText() != null && !post.getText().isBlank()) {
-                item.put("caption", post.getText());
+                item.put("caption", text);
                 item.put("parse_mode", "HTML");
             }
             items.add(item);
@@ -224,5 +230,16 @@ public class TelegramPublisher implements Publisher {
     private int backoffSeconds(int attempt) {
         // flat exponential backoff: 1, 2, 4
         return (int) Math.pow(2, attempt - 1);
+    }
+
+    // Construct text from title, summary and bullets
+    private String buildText(Post post) {
+
+        return "<a href=\"" + post.getUrl() + "\">" +
+                "<b>" + post.getSourceName() + "</b>" +
+                "</a>" +
+                "<b>" + ": " + post.getSummary() + "</b>" +
+                "\n\n" +
+                post.getText();
     }
 }

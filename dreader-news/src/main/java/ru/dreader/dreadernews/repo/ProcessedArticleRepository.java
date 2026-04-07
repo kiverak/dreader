@@ -17,6 +17,7 @@ public interface ProcessedArticleRepository extends JpaRepository<ProcessedArtic
     @Query("""
             SELECT pa FROM ProcessedArticle pa
             LEFT JOIN FETCH pa.tags
+            LEFT JOIN FETCH pa.source
             WHERE pa.publicationDate >= CURRENT_TIMESTAMP - 1 DAY
                         AND pa.llmParsed = false
             ORDER BY pa.publicationDate ASC

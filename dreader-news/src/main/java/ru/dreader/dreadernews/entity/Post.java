@@ -25,8 +25,17 @@ import java.util.Set;
 @AllArgsConstructor
 public class Post extends BaseEntity {
 
-    @Column(columnDefinition = "text", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String text;
+
+    @Column(nullable = false)
+    private String summary;
+
+    @Column(nullable = false, unique = true)
+    private String url;
+
+    @Column(nullable = false)
+    private String sourceName;
 
     @Column
     private Instant scheduledAt;

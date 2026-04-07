@@ -42,7 +42,7 @@ public class ArticleController {
 
             if (!acquired) {
                 lockAcquireFailures.increment();
-                throw new RuntimeException("Timeout: unable to acquire parse lock within 30 seconds");
+                throw new RuntimeException("Timeout: unable to acquire parse lock within 60 seconds");
             }
 
             // Сколько времени запрос ждал lock

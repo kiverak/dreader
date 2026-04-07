@@ -22,6 +22,9 @@ public class ProcessedArticlePostMapper {
         Post post = new Post();
 
         post.setText(buildText(article, response));
+        post.setSummary(response.summary());
+        post.setUrl(article.getUrl());
+        post.setSourceName(article.getSource().getName());
         post.setStatus(PostStatus.PENDING);
         post.setScheduledAt(Instant.now()); // TODO logic for scheduling
 
@@ -33,15 +36,9 @@ public class ProcessedArticlePostMapper {
         return post;
     }
 
-    // Construct text from title, summary and bullets
+    // Construct text from bullets
     private String buildText(ProcessedArticle article, ArticleResponse response) {
         StringBuilder textBuilder = new StringBuilder();
-
-        // Title as bold link
-        textBuilder.append("<a href=\"").append(article.getUrl()).append("\">")
-                .append("<b>").append(article.getSource().getName()).append("</b>")
-                .append("</a>")
-                .append("<b>").append(": ").append(response.summary()).append("</b>").append("\n\n");
 
         if (response.summaryBullets() != null) {
             for (String bullet : response.summaryBullets()) {
