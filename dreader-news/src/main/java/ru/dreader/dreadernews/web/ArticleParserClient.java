@@ -1,6 +1,5 @@
 package ru.dreader.dreadernews.web;
 
-import dto.ArticleDto;
 import dto.SourceDetails;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,8 +7,6 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Component
 public class ArticleParserClient {
@@ -23,32 +20,6 @@ public class ArticleParserClient {
         this.webClient = defaultWebClient.mutate()
                 .baseUrl(gatewayUrl + "/parser/api")
                 .build();
-    }
-
-    public List<ArticleDto> getNews() {
-        return webClient.get()
-                .uri("/news")
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, response ->
-                        response.bodyToMono(String.class)
-                                .flatMap(errorBody -> Mono.error(new RuntimeException("Error getting news: " + errorBody)))
-                )
-                .bodyToFlux(ArticleDto.class)
-                .collectList()
-                .block();
-    }
-
-    public List<SourceDetails> getAllSources() {
-        return webClient.get()
-                .uri("/source")
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, response ->
-                        response.bodyToMono(String.class)
-                                .flatMap(errorBody -> Mono.error(new RuntimeException("Error getting sources: " + errorBody)))
-                )
-                .bodyToFlux(SourceDetails.class)
-                .collectList()
-                .block();
     }
 
     public SourceDetails createSource(SourceDetails sourceDetails) {
