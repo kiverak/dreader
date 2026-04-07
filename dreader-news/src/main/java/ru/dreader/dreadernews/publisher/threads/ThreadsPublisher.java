@@ -131,7 +131,7 @@ public class ThreadsPublisher implements Publisher {
 
     private ThreadsCreateContainerResponse createContainer(Post post, ThreadsToken accessToken, String mediaType) {
 
-        String text = post.getText().substring(0, 500); // TODO remake text building
+        String text = post.getText().substring(0, Math.min(post.getText().length(), 500)); // TODO remake text building
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("text", text);
