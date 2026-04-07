@@ -22,7 +22,7 @@ public class CategoryService {
 
     @DebugLog
     @Transactional(readOnly = true)
-    @Cacheable(value = "categories", key = "#root.method.name")
+    @Cacheable(value = "categoryDtoList", key = "#root.method.name")
     public List<CategoryDto> getAll() {
         return categoryRepository.findAll().stream()
                 .map(category -> new CategoryDto(category.getId(), category.getName(), category.getLang().getCode()))
@@ -30,7 +30,7 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "categories", key = "#id")
+    @Cacheable(value = "categoryDto", key = "#id")
     public CategoryDto getById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
@@ -38,7 +38,7 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "categories", key = "#ids")
+    @Cacheable(value = "categoryList", key = "#ids")
     public List<Category> getCategoriesByIds(List<Long> ids) {
         return categoryRepository.findAllById(ids);
     }
@@ -65,7 +65,7 @@ public class CategoryService {
     }
 
     @Transactional
-    @CacheEvict(value = "categories", key = "#id")
+    @CacheEvict(cacheNames = {"categoryDto", "categoryDtoList", "categoryList"})
     public CategoryDto update(Long id, CategoryDto dto) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
@@ -76,7 +76,7 @@ public class CategoryService {
     }
 
     @Transactional
-    @CacheEvict(value = "categories", key = "#id")
+    @CacheEvict(cacheNames = {"categoryDto", "categoryDtoList", "categoryList"})
     public void delete(Long id) {
         if (!categoryRepository.existsById(id)) {
             throw new ResourceNotFoundException("Category not found with id: " + id);

@@ -14,6 +14,7 @@ import ru.dreader.dreadernews.dto.PostDto;
 import ru.dreader.dreadernews.entity.Post;
 import ru.dreader.dreadernews.mapper.PostMapper;
 import ru.dreader.dreadernews.repo.PostRepository;
+import ru.dreader.dreadernews.utils.RestPageImpl;
 
 import java.time.Instant;
 import java.util.List;
@@ -26,7 +27,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
 
-    @Cacheable(value = "posts", key = "#id")
+    @Cacheable(value = "postDto", key = "#id")
     @Transactional(readOnly = true)
     public PostDto getById(Long id) {
         Post post = postRepository.findById(id)
@@ -35,11 +36,11 @@ public class PostService {
     }
 
     @Cacheable(
-            value = "publishedPosts",
+            value = "postDtoList",
             key = "T(java.util.Objects).hash(#categoryId, #size, #page, #sort, #order)"
     )
     @Transactional(readOnly = true)
-    public Page<PostDto> getPublished(Long categoryId, Integer size, Integer page, String sort, String order) {
+    public Page<PostDto> getAll(Long categoryId, Integer size, Integer page, String sort, String order) {
         Sort sortBy = Sort.by(Sort.Direction.fromString(order != null ? order : "DESC"), sort);
         Pageable pageable = PageRequest.of(page, size, sortBy);
 
@@ -50,7 +51,9 @@ public class PostService {
             postPage = postRepository.findAll(pageable);
         }
 
-        return postPage.map(postMapper::toDto);
+        Page<PostDto> dtoPage = postPage.map(postMapper::toDto);
+
+        return new RestPageImpl<>(dtoPage);
     }
 
     @Transactional(readOnly = true)
@@ -63,7 +66,7 @@ public class PostService {
         postRepository.save(post);
     }
 
-    @CacheEvict(value = "posts", key = "#id")
+    @CacheEvict(cacheNames = {"postDto", "postDtoList"})
     @Transactional
     public void delete(Long id) {
         if (!postRepository.existsById(id)) {
@@ -72,7 +75,7 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
-    @CacheEvict(value = "posts", allEntries = true)
+    @CacheEvict(value = "postDtoList", allEntries = true)
     @Transactional
     public void delete(List<Long> ids) {
         postRepository.deleteAllById(ids);

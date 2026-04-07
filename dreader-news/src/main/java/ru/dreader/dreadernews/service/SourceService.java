@@ -43,7 +43,7 @@ public class SourceService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "sourceDetails", key = "#root.method.name")
+    @Cacheable(value = "sourceDetailsList", key = "#root.method.name")
     public List<SourceDetails> getAll() {
         return sourceRepository.findAll().stream()
                 .map(sourceMapper::toDto)
@@ -51,7 +51,7 @@ public class SourceService {
     }
 
     @Transactional
-    @CacheEvict(value = {"sourceDetails", "source"}, allEntries = true)
+    @CacheEvict(value = {"sourceDetails", "source", "sourceDetailsList"}, allEntries = true)
     public void saveOrUpdateAll(List<SourceDetails> sourceDetailsList) {
 
         Map<String, SourceDetails> detailsByName = sourceDetailsList.stream()
@@ -97,6 +97,7 @@ public class SourceService {
     }
 
     @Transactional
+    @CacheEvict(value = {"sourceDetails", "source", "sourceDetailsList"}, allEntries = true)
     public SourceDetails create(SourceDetails sourceDetails) {
         if (sourceRepository.findByName(sourceDetails.name()).isPresent()) {
             throw new IllegalArgumentException("Source with name " + sourceDetails.name() + " already exists");
@@ -110,7 +111,7 @@ public class SourceService {
     }
 
     @Transactional
-    @CacheEvict(value = {"sourceDetails", "source"}, allEntries = true)
+    @CacheEvict(value = {"sourceDetails", "source", "sourceDetailsList"}, allEntries = true)
     public SourceDetails update(Long id, SourceDetails sourceDetails) {
         Source source = sourceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Source not found with id: " + id));
@@ -128,7 +129,7 @@ public class SourceService {
     }
 
     @Transactional
-    @CacheEvict(value = {"sourceDetails", "source"}, key = "#id")
+    @CacheEvict(value = {"sourceDetails", "source", "sourceDetailsList"})
     public void delete(Long id) {
         if (!sourceRepository.existsById(id)) {
             throw new IllegalArgumentException("Source not found with id: " + id);
@@ -139,7 +140,7 @@ public class SourceService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "source", key = "#sourceNames")
+    @Cacheable(value = "sourceList", key = "#sourceNames")
     public List<Source> findAllBySourceNames(List<String> sourceNames) {
         return sourceRepository.findAllBySourceNames(sourceNames);
     }

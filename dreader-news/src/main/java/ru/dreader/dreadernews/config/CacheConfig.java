@@ -31,11 +31,11 @@ public class CacheConfig {
 
         Map<String, RedisCacheConfiguration> configs = new HashMap<>();
 
-        configs.put("posts", RedisCacheConfiguration.defaultCacheConfig()
+        configs.put("postDto", RedisCacheConfiguration.defaultCacheConfig()
                 .serializeValuesWith(jsonSerializer)
                 .entryTtl(Duration.ofMinutes(10)));
 
-        configs.put("publishedPosts", RedisCacheConfiguration.defaultCacheConfig()
+        configs.put("postDtoList", RedisCacheConfiguration.defaultCacheConfig()
                 .serializeValuesWith(jsonSerializer)
                 .entryTtl(Duration.ofMinutes(5)));
 
@@ -43,7 +43,15 @@ public class CacheConfig {
                 .serializeValuesWith(jsonSerializer)
                 .entryTtl(Duration.ofMinutes(60)));
 
-        configs.put("categories", RedisCacheConfiguration.defaultCacheConfig()
+        configs.put("categoryList", RedisCacheConfiguration.defaultCacheConfig()
+                .serializeValuesWith(jsonSerializer)
+                .entryTtl(Duration.ofHours(60)));
+
+        configs.put("categoryDtoList", RedisCacheConfiguration.defaultCacheConfig()
+                .serializeValuesWith(jsonSerializer)
+                .entryTtl(Duration.ofHours(60)));
+
+        configs.put("categoryDto", RedisCacheConfiguration.defaultCacheConfig()
                 .serializeValuesWith(jsonSerializer)
                 .entryTtl(Duration.ofHours(60)));
 
@@ -51,7 +59,15 @@ public class CacheConfig {
                 .serializeValuesWith(jsonSerializer)
                 .entryTtl(Duration.ofHours(60)));
 
+        configs.put("sourceList", RedisCacheConfiguration.defaultCacheConfig()
+                .serializeValuesWith(jsonSerializer)
+                .entryTtl(Duration.ofHours(60)));
+
         configs.put("sourceDetails", RedisCacheConfiguration.defaultCacheConfig()
+                .serializeValuesWith(jsonSerializer)
+                .entryTtl(Duration.ofHours(60)));
+
+        configs.put("sourceDetailsList", RedisCacheConfiguration.defaultCacheConfig()
                 .serializeValuesWith(jsonSerializer)
                 .entryTtl(Duration.ofHours(60)));
 

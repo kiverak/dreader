@@ -19,14 +19,14 @@ public class PostController {
     }
 
     @GetMapping
-    public Page<PostDto> getPublished(
+    public Page<PostDto> getAll(
             @RequestParam(required = false) Long categoryId,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "updatedAt") String sort,
+            @RequestParam(defaultValue = "createdAt") String sort,
             @RequestParam(defaultValue = "desc") String order
     ) {
-        return postService.getPublished(categoryId, size, page, sort, order);
+        return postService.getAll(categoryId, size, page, sort, order);
     }
 
 }
