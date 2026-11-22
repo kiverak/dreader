@@ -1,6 +1,6 @@
 services:
   controller-1:
-    image: apache/kafka:4.1.1
+    image: apache/kafka:4.4.0
     container_name: controller-1
     environment:
       KAFKA_NODE_ID: 1
@@ -18,7 +18,7 @@ services:
     restart: on-failure
 
   controller-2:
-    image: apache/kafka:4.1.1
+    image: apache/kafka:4.4.0
     container_name: controller-2
     environment:
       KAFKA_NODE_ID: 2
@@ -36,7 +36,7 @@ services:
     restart: on-failure
 
   controller-3:
-    image: apache/kafka:4.1.1
+    image: apache/kafka:4.4.0
     container_name: controller-3
     environment:
       KAFKA_NODE_ID: 3
@@ -54,7 +54,7 @@ services:
     restart: on-failure
 
   broker-1:
-    image: apache/kafka:4.1.1
+    image: apache/kafka:4.4.0
     container_name: broker-1
     ports:
       - "29092:9092"
@@ -80,7 +80,7 @@ services:
       - controller-3
 
   broker-2:
-    image: apache/kafka:4.1.1
+    image: apache/kafka:4.4.0
     container_name: broker-2
     ports:
       - "39092:9092"
@@ -106,7 +106,7 @@ services:
       - controller-3
 
   broker-3:
-    image: apache/kafka:4.1.1
+    image: apache/kafka:4.4.0
     container_name: broker-3
     ports:
       - "49092:9092"
@@ -184,7 +184,7 @@ services:
     pull_policy: always
     tty: true
     restart: unless-stopped
-    image: ollama/ollama:0.20.2-rocm
+    image: ollama/ollama:0.40.17-rocm
     ports:
       - "11434:11434"
     volumes:
